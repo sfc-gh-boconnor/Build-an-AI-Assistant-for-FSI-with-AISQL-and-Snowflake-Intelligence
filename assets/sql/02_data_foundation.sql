@@ -656,14 +656,17 @@ CREATE OR REPLACE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STOCK_PRICE_TIMESERI
 -- Create temporary stage for parquet file
 CREATE TEMPORARY STAGE IF NOT EXISTS stock_price_stage;
 
--- Upload parquet file (adjust path as needed)
--- PUT file:///path/to/stock_price_timeseries_snow.parquet @stock_price_stage;
--- Note: Path will be set by user or deploy script
+-- Copy parquet file from Git repository to stage
+COPY FILES
+INTO @stock_price_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('stock_price_timeseries_snow.parquet');
 
--- Load from parquet
+-- Load from parquet with column name matching
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STOCK_PRICE_TIMESERIES
 FROM @stock_price_stage/stock_price_timeseries_snow.parquet
-FILE_FORMAT = (TYPE = PARQUET);
+FILE_FORMAT = (TYPE = PARQUET)
+MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;
 
 -- Verify load
 SELECT 
