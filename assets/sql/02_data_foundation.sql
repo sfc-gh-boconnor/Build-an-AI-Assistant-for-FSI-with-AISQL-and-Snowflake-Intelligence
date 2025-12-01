@@ -1,4 +1,6 @@
-----agent tools
+-- =====================================================
+-- FSI Cortex Assistant - Data Foundation
+-- =====================================================
 
 ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"sql"}}''';
 
@@ -10,81 +12,11 @@ USE WAREHOUSE DEFAULT_WH;
 USE DATABASE ACCELERATE_AI_IN_FSI;
 USE SCHEMA DEFAULT_SCHEMA;
 
--- External access integration SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
--- is created in configure_attendee_account.template.sql
-
-CREATE OR REPLACE FUNCTION ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.WEB_SEARCH("QUERY" VARCHAR)
-RETURNS VARCHAR
-LANGUAGE PYTHON
-RUNTIME_VERSION = '3.10'
-PACKAGES = ('requests','beautifulsoup4')
-HANDLER = 'search_web'
-EXTERNAL_ACCESS_INTEGRATIONS = (SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION)
-AS '
-import _snowflake
-import requests
-from bs4 import BeautifulSoup
-import urllib.parse
-import json
-
-def search_web(query):
-    encoded_query = urllib.parse.quote_plus(query)
-    search_url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
-    
-    headers = {
-        ''User-Agent'': ''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36''
-    }
-
-    try:
-        response = requests.get(search_url, headers=headers, timeout=10)
-        response.raise_for_status() 
-        
-        soup = BeautifulSoup(response.text, ''html.parser'')
-        
-        search_results_list = []
-        
-        results_container = soup.find(id=''links'')
-
-        if results_container:
-            for result in results_container.find_all(''div'', class_=''result''):
-                # Check if the result is an ad and skip it.
-                if ''result--ad'' in result.get(''class'', []):
-                    continue
-
-                # Find title, link, and snippet.
-                title_tag = result.find(''a'', class_=''result__a'')
-                link_tag = result.find(''a'', class_=''result__url'')
-                snippet_tag = result.find(''a'', class_=''result__snippet'')
-                
-                if title_tag and link_tag and snippet_tag:
-                    title = title_tag.get_text(strip=True)
-                    link = link_tag[''href'']
-                    snippet = snippet_tag.get_text(strip=True)
-                    
-                    # Append the result as a dictionary to our list.
-                    search_results_list.append({
-                        "title": title,
-                        "link": link,
-                        "snippet": snippet
-                    })
-
-                # Break the loop once we have the top 3 results.
-                if len(search_results_list) >= 3:
-                    break
-
-        if search_results_list:
-            # Return the list of dictionaries as a JSON string.
-            return json.dumps(search_results_list, indent=2)
-        else:
-            # Return a JSON string indicating no results found.
-            return json.dumps({"status": "No search results found."})
-
-    except requests.exceptions.RequestException as e:
-        return json.dumps({"error": f"An error occurred while making the request: {e}"})
-    except Exception as e:
-        return json.dumps({"error": f"An unexpected error occurred during parsing: {e}"})
-';
-
+-- =====================================================
+-- Note: WEB_SEARCH function moved to end of script
+-- It requires SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
+-- which is created in 01_configure_account.sql
+-- =====================================================
 
 -- Send Email Notification Procedure (Python)
 -- This procedure sends email notifications using SYSTEM$SEND_EMAIL with email integration
@@ -1931,3 +1863,91 @@ SELECT 'FULL_TRANSCRIPTS', COUNT(*) FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.FUL
 
 -- Show all search services created
 SHOW CORTEX SEARCH SERVICES;
+
+-- =====================================================
+-- WEB_SEARCH Function (Requires External Access Integration)
+-- =====================================================
+-- This function requires SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
+-- which is created in 01_configure_account.sql
+-- Placed at end to ensure integration exists
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.WEB_SEARCH("QUERY" VARCHAR)
+RETURNS VARCHAR
+LANGUAGE PYTHON
+RUNTIME_VERSION = '3.10'
+PACKAGES = ('requests','beautifulsoup4')
+HANDLER = 'search_web'
+EXTERNAL_ACCESS_INTEGRATIONS = (SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION)
+AS '
+import _snowflake
+import requests
+from bs4 import BeautifulSoup
+import urllib.parse
+import json
+
+def search_web(query):
+    encoded_query = urllib.parse.quote_plus(query)
+    search_url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
+    
+    headers = {
+        ''User-Agent'': ''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36''
+    }
+
+    try:
+        response = requests.get(search_url, headers=headers, timeout=10)
+        response.raise_for_status() 
+        
+        soup = BeautifulSoup(response.text, ''html.parser'')
+        
+        search_results_list = []
+        
+        results_container = soup.find(id=''links'')
+
+        if results_container:
+            for result in results_container.find_all(''div'', class_=''result''):
+                # Check if the result is an ad and skip it.
+                if ''result--ad'' in result.get(''class'', []):
+                    continue
+
+                # Find title, link, and snippet.
+                title_tag = result.find(''a'', class_=''result__a'')
+                link_tag = result.find(''a'', class_=''result__url'')
+                snippet_tag = result.find(''a'', class_=''result__snippet'')
+                
+                if title_tag and link_tag and snippet_tag:
+                    title = title_tag.get_text(strip=True)
+                    link = link_tag[''href'']
+                    snippet = snippet_tag.get_text(strip=True)
+                    
+                    # Append the result as a dictionary to our list.
+                    search_results_list.append({
+                        "title": title,
+                        "link": link,
+                        "snippet": snippet
+                    })
+
+                # Break the loop once we have the top 3 results.
+                if len(search_results_list) >= 3:
+                    break
+
+        if search_results_list:
+            # Return the list of dictionaries as a JSON string.
+            return json.dumps(search_results_list, indent=2)
+        else:
+            # Return a JSON string indicating no results found.
+            return json.dumps({"status": "No search results found."})
+
+    except requests.exceptions.RequestException as e:
+        return json.dumps({"error": f"An error occurred while making the request: {e}"})
+    except Exception as e:
+        return json.dumps({"error": f"An unexpected error occurred during parsing: {e}"})
+';
+
+SELECT 'WEB_SEARCH function created successfully!' AS status;
+
+-- =====================================================
+-- Data Foundation Deployment Complete!
+-- =====================================================
+
+SELECT 'Data foundation deployment completed successfully!' AS status;
