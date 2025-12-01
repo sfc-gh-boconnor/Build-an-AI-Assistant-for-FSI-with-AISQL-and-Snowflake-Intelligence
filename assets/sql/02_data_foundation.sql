@@ -1,9 +1,14 @@
 ----agent tools
 
 ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"sql"}}''';
+
 -- Use ATTENDEE_ROLE for all object creation
 USE ROLE ATTENDEE_ROLE;
 USE WAREHOUSE DEFAULT_WH;
+
+-- Set database context (required for stage creation)
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA DEFAULT_SCHEMA;
 
 -- External access integration SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
 -- is created in configure_attendee_account.template.sql
