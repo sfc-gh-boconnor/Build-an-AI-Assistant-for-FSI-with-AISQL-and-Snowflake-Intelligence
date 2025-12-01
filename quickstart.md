@@ -271,10 +271,117 @@ SHOW NOTEBOOKS IN SCHEMA NOTEBOOKS;             -- Should see 4 notebooks
 **All set?** ✅ Continue to the next section!
 
 <!-- ------------------------ -->
+## Git Integration Deployment (Alternative)
+Duration: 10
+
+### Deploy Directly from GitHub Without Downloads
+
+Instead of downloading files, you can connect Snowflake directly to this GitHub repository and run scripts from within Snowsight!
+
+### Step 1: Create Git Integration
+
+Open Snowflake UI → **SQL Worksheet** and run:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+
+-- Create API integration for GitHub
+CREATE OR REPLACE API INTEGRATION git_api_integration
+    API_PROVIDER = git_https_api
+    API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+    ENABLED = TRUE
+    COMMENT = 'GitHub integration for Snowflake Labs repositories';
+
+-- Create Git repository object
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
+    API_INTEGRATION = git_api_integration
+    ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
+    COMMENT = 'FSI AI Assistant Quickstart';
+
+-- Fetch code from GitHub
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+
+-- Verify setup
+SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
+```
+
+✅ **Git integration complete!** Repository is now connected to Snowflake.
+
+### Step 2: Browse Repository in Snowflake UI
+
+1. Navigate to: **Projects** → **Git Repositories**
+2. Click on: **ACCELERATE_AI_IN_FSI_REPO**
+3. Explore the file structure:
+   - `assets/sql/` - Deployment scripts
+   - `assets/data/` - Data files
+   - `assets/documents/` - PDFs, images, audio
+   - `assets/Notebooks/` - Jupyter notebooks
+   - `README.md` - Documentation
+
+### Step 3: Execute Scripts from Git
+
+**Method A: Run all scripts sequentially** (in one worksheet):
+
+```sql
+-- Execute deployment scripts directly from GitHub
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+
+-- OPTIONAL: Only run if GPU available in your region
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
+```
+
+**Method B: Use Git Repositories UI** (interactive):
+
+1. In Git Repositories, navigate to `assets/sql/`
+2. Right-click `01_configure_account.sql` → **"Open in new worksheet"**
+3. Click **Run**
+4. Repeat for scripts 02-08 (and optionally 05b)
+
+### Benefits of Git Integration
+
+- ✅ **No downloads** - Deploy directly from GitHub
+- ✅ **Always current** - `ALTER REPO FETCH` pulls latest code
+- ✅ **Browser-only** - No CLI tools needed
+- ✅ **Integrated** - All in Snowsight UI
+- ✅ **Visual** - Browse files and documentation
+- ✅ **Version control** - See Git history in Snowflake
+
+### Update Repository Anytime
+
+To pull latest changes from GitHub:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+```
+
+### List Available Files
+
+```sql
+-- See all SQL scripts
+LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
+
+-- See data files
+LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
+```
+
+---
+
+> **💡 Tip**: Git integration is the **easiest deployment method** - everything runs in your browser without downloading any files!
+
+<!-- ------------------------ -->
 ## Verify Your Deployment
 Duration: 5
 
-After the quick deploy completes, let's verify everything was created successfully.
+After deployment completes (using Git integration, SnowCLI, or manual method), let's verify everything was created successfully.
 
 ### Check Database Objects
 

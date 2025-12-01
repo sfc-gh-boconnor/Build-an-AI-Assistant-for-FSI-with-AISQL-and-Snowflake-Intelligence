@@ -148,7 +148,7 @@ EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_se
 - ✅ Browser-only deployment
 - ✅ See full documentation in Git UI
 
-**See**: [GIT_INTEGRATION_GUIDE.md](GIT_INTEGRATION_GUIDE.md) for detailed instructions
+**See**: [quickstart.md](quickstart.md) for complete step-by-step guide including Git integration setup
 
 ---
 
