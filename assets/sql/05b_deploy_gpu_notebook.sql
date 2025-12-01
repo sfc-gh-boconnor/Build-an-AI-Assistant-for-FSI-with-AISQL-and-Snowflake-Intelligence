@@ -57,9 +57,9 @@ CREATE OR REPLACE NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."3_BUILD_A_QUANTI
     FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK3'
     MAIN_FILE = '3_BUILD_A_QUANTITIVE_MODEL.ipynb'
     QUERY_WAREHOUSE = 'DEFAULT_WH'
-    COMPUTE_POOL='CP_GPU_NV_S'
-    -- Note: Compute pools ignore environment.yml - using GPU runtime with pre-installed ML packages
-    RUNTIME_NAME='SYSTEM$GPU_RUNTIME_3_11';  -- Has lightgbm, scikit-learn, etc. pre-installed
+    COMPUTE_POOL='CP_GPU_NV_S';
+    -- Note: GPU runtime is automatically used with GPU compute pools
+    -- The ds_environment.yml file specifies the required packages (lightgbm, scikit-learn, etc.)
 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."3_BUILD_A_QUANTITIVE_MODEL" ADD LIVE VERSION FROM LAST;
 
