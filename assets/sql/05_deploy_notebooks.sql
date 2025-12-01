@@ -36,7 +36,11 @@ INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4
 FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
 FILES = ('4_CREATE_SEARCH_SERVICE.ipynb', 'environment.yml');
 
--- Notebook 5 removed (only deploying 4 core notebooks in quickstart)
+-- Copy Notebook 5 files
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK5
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
+FILES = ('5_CORTEX_ANALYST.ipynb', 'environment.yml');
 
 
 
@@ -83,7 +87,7 @@ COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."5_CORTEX_ANALYST" ADD LIVE VERSION FROM LAST;
 
 -- =====================================================
--- DEPLOYMENT COMPLETE: Standard Notebooks (3 notebooks)
+-- DEPLOYMENT COMPLETE: Standard Notebooks (4 notebooks)
 -- =====================================================
 
 SELECT 'Standard notebooks deployed successfully!' AS status,
