@@ -56,8 +56,8 @@ GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
 GRANT MANAGE GRANTS ON ACCOUNT TO ROLE ATTENDEE_ROLE;
 GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE ATTENDEE_ROLE;
 GRANT IMPORT SHARE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT CREATE STREAMLIT ON ACCOUNT TO ROLE ATTENDEE_ROLE;
 GRANT CREATE COMPUTE POOL ON ACCOUNT TO ROLE ATTENDEE_ROLE;
+-- Note: CREATE STREAMLIT is granted at SCHEMA level (see after schema creation)
 
 -- Grant warehouse usage
 GRANT USAGE ON WAREHOUSE DEFAULT_WH TO ROLE ATTENDEE_ROLE;
@@ -124,6 +124,16 @@ $$Cortex Analyst schema containing:
   - SNOWFLAKE_ANALYSTS_VIEW (Snowflake deep-dive)
 • Purpose: Text-to-SQL with Cortex Analyst
 • Users can ask questions in plain English$$;
+
+-- =====================================================
+-- Grant Schema-Level Privileges
+-- =====================================================
+
+-- Grant CREATE STREAMLIT on schemas (not available at ACCOUNT level)
+GRANT CREATE STREAMLIT ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
+
+-- Grant CREATE NOTEBOOK on schemas
+GRANT CREATE NOTEBOOK ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
 
 -- =====================================================
 -- Configuration Complete!
