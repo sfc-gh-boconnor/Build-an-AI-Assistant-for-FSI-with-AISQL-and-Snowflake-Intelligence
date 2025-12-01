@@ -1,0 +1,14 @@
+name: notebook_environment
+channels:
+  - snowflake
+dependencies:
+  - python=3.11
+  - lightgbm==4.6.0
+  - matplotlib
+  - scikit-learn==1.7.2
+  - seaborn
+  - snowflake-ml-python>=1.17.0,<2
+  - statsmodels
+  - pandas>=2.1.4,<3
+  - numpy>=1.23,<2
+  - cloudpickle==3.1.1
