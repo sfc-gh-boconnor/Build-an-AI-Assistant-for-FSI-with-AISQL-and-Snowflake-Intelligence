@@ -1513,12 +1513,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_em
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('call_embeds.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/call_embeds.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds_stage/call_embeds.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1712,10 +1716,14 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.social_
     NULL_IF = ('NULL', 'null', '')
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.social_media_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('social_media_nrnt_collapse.csv');
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SOCIAL_MEDIA_NRNT
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/social_media_nrnt_collapse.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.social_media_stage/social_media_nrnt_collapse.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
