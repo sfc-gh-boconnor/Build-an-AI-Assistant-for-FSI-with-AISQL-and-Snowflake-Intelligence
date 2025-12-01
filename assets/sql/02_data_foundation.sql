@@ -133,7 +133,7 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
 
 -- Copy CSV file from Git repository to regular stage
 COPY FILES
-INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_data_stage
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
 FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('email_previews_data.csv');
 
@@ -146,7 +146,7 @@ COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
     HTML_CONTENT,
     CREATED_AT
 )
-FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_data_stage/email_previews_data.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/email_previews_data.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = '|'
