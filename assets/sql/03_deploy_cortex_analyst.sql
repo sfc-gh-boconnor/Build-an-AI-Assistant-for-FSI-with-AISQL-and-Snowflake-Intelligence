@@ -6,10 +6,11 @@ CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.cortex_analyst
   DIRECTORY = (enable = true)
   ENCRYPTION = (type = 'snowflake_sse');
 
-
-PUT file:///../semantic_models/semantic_model.yaml @ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.cortex_analyst auto_compress = false overwrite = true;
-PUT file:///../semantic_models/analyst_sentiments.yaml @ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.cortex_analyst auto_compress = false overwrite = true;
-
+-- Copy YAML files from Git repository to stage
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.cortex_analyst
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/semantic_models/
+FILES = ('semantic_model.yaml', 'analyst_sentiments.yaml');
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.cortex_analyst REFRESH;
 
