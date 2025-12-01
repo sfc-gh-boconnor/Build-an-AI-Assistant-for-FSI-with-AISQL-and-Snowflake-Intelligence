@@ -102,8 +102,11 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 -- into the EMAIL_PREVIEWS table from a pipe-delimited CSV file
 -- =====================================================
 
--- Create a temporary stage for the CSV file
-CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_data_stage
+-- =====================================================
+-- Create stage for data files from Git repository
+-- =====================================================
+-- This stage will receive files copied from Git repo
+CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
   FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = '|'
@@ -119,9 +122,15 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_d
 -- =====================================================
 -- DATA LOADING FROM GIT REPOSITORY
 -- =====================================================
--- When using Git integration, files are in the Git repository stage
--- No PUT commands needed - load directly from Git repo
+-- Step 1: Copy data files from Git repository to regular stage
+-- Step 2: Load data from regular stage into tables
 -- =====================================================
+
+-- Copy CSV file from Git repository to regular stage
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_data_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('email_previews_data.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
@@ -132,7 +141,7 @@ COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
     HTML_CONTENT,
     CREATED_AT
 )
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/email_previews_data.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_data_stage/email_previews_data.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = '|'
@@ -818,12 +827,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ai_tran
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('ai_transcripts_analysts_sentiments.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALYSTS_SENTIMENTS;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALYSTS_SENTIMENTS
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/ai_transcripts_analysts_sentiments.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/ai_transcripts_analysts_sentiments.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -862,12 +875,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.transcr
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('transcribed_earnings_calls.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/transcribed_earnings_calls.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/transcribed_earnings_calls.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -907,12 +924,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.speaker
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('speaker_mapping.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SPEAKER_MAPPING;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SPEAKER_MAPPING
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/speaker_mapping.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/speaker_mapping.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -952,12 +973,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ai_tran
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('ai_transcribe_no_time.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIBE_NO_TIME;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIBE_NO_TIME
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/ai_transcribe_no_time.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/ai_transcribe_no_time.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -989,12 +1014,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.transcr
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('transcribed_earnings_calls_with_sentiment.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/transcribed_earnings_calls_with_sentiment.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/transcribed_earnings_calls_with_sentiment.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1026,12 +1055,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.transcr
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('transcripts_by_minute.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIPTS_BY_MINUTE;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.TRANSCRIPTS_BY_MINUTE
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/transcripts_by_minute.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/transcripts_by_minute.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1063,12 +1096,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.sentime
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('sentiment_analysis.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SENTIMENT_ANALYSIS;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SENTIMENT_ANALYSIS
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/sentiment_analysis.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/sentiment_analysis.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1100,12 +1137,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.infogra
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('infographics_for_search.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.INFOGRAPHICS_FOR_SEARCH;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.INFOGRAPHICS_FOR_SEARCH
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/infographics_for_search.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/infographics_for_search.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1137,12 +1178,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.analyst
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('analyst_reports.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ANALYST_REPORTS;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ANALYST_REPORTS
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/analyst_reports.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/analyst_reports.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
@@ -1561,12 +1606,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.email_e
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to regular stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('email_previews_extracted.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS_EXTRACTED;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS_EXTRACTED
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/email_previews_extracted.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage/email_previews_extracted.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
