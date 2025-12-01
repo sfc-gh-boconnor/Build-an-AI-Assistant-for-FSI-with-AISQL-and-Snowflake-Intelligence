@@ -168,24 +168,32 @@ Duration: 10
 
 USE ROLE ACCOUNTADMIN;
 
+-- Create database and schema for Git repository
+CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
+CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.GIT_REPOS;
+
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA GIT_REPOS;
+
+-- Create API integration for GitHub
 CREATE OR REPLACE API INTEGRATION git_api_integration
     API_PROVIDER = git_https_api
     API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
     ENABLED = TRUE;
 
-CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
+-- Create Git repository object (fully qualified name)
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
     API_INTEGRATION = git_api_integration
     ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git';
 
-ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+-- Fetch code from GitHub
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
 
 SELECT 'Git integration ready!' AS status;
 ```
 
 3. Run the script
 4. ✅ **Done!** You're now connected to GitHub
-
-**See**: [GIT_INTEGRATION_GUIDE.md](GIT_INTEGRATION_GUIDE.md) for detailed instructions
 
 ---
 
@@ -194,22 +202,22 @@ SELECT 'Git integration ready!' AS status;
 **Option A: Execute all at once** (in one worksheet):
 
 ```sql
--- Run deployment scripts directly from GitHub
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+-- Run deployment scripts directly from GitHub (fully qualified names)
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
 -- Optional GPU notebook (skip if unavailable):
--- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
 ```
 
 **Option B: Use Git Repositories UI** (interactive):
 
-1. Navigate: **Projects** → **Git Repositories** → **ACCELERATE_AI_IN_FSI_REPO**
+1. Navigate: **Projects** → **Git Repositories** → **ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO**
 2. Browse to: `assets/sql/`
 3. Right-click each file (01-08) → "Open in new worksheet"
 4. Execute each script in order
