@@ -43,7 +43,11 @@ use warehouse LARGE_WH;
 
 create or replace stage semantic_models encryption = (type = 'snowflake_sse') directory = ( enable = true );
 
-PUT file:///../semantic_models/analyst_sentiments.yaml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.semantic_models auto_compress = false overwrite = true;
+-- Copy YAML file from Git repository
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.semantic_models
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/semantic_models/
+FILES = ('analyst_sentiments.yaml');
 
 alter stage semantic_models refresh;
 
@@ -73,10 +77,11 @@ create or replace file format ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_FORMAT
     empty_field_as_null = true
     error_on_column_count_mismatch = false;
 
--- Upload CSV files to stage
-PUT file:///../data/fsi_data.csv @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE auto_compress = false overwrite = true;
-PUT file:///../data/ai_transcripts_analysts_sentiments.csv @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE auto_compress = false overwrite = true;
-PUT file:///../data/unique_transcripts.csv @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE auto_compress = false overwrite = true;
+-- Upload CSV files to stage from Git repository
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('fsi_data.csv', 'ai_transcripts_analysts_sentiments.csv', 'unique_transcripts.csv');
 
 -- Create table for FSI data (matching CSV column order)
 create or replace table ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.fsi_data (

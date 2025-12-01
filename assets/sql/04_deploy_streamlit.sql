@@ -6,12 +6,18 @@ create schema if not exists ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 -----create streamlit stage for sophisticated agent
 CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2 DIRECTORY = (ENABLE = TRUE) ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
 
-------put streamlit files in stage
--------put streamlit 2 (sophisticated agent) in stage
-PUT file:///../Streamlit/2_cortex_agent_soph/app.py @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2 auto_compress = false overwrite = true;
-PUT file:///../Streamlit/2_cortex_agent_soph/environment.yml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2 auto_compress = false overwrite = true;
-PUT file:///../Streamlit/2_cortex_agent_soph/config.toml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2/.streamlit auto_compress = false overwrite = true;
-PUT file:///../Streamlit/2_cortex_agent_soph/styles.css @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2/ auto_compress = false overwrite = true;
+------Copy streamlit files from Git repository to stage
+-------Copy streamlit 2 (sophisticated agent) files
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
+FILES = ('app.py', 'environment.yml', 'styles.css');
+
+-- Copy config.toml to .streamlit subdirectory
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2/.streamlit
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
+FILES = ('config.toml');
 
 
 

@@ -20,30 +20,20 @@ CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_S
     COMMENT = 'Stage for SnowMail Native App artifacts';
 
 -- ========================================
--- Step 2: Upload Application Files
+-- Step 2: Upload Application Files from Git Repository
 -- ========================================
 
--- Note: PUT commands execute relative to where the SQL script runs from
--- Upload manifest.yml
-PUT file:///../native_app_snowmail/manifest.yml 
-    @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/ 
-    OVERWRITE=TRUE 
-    AUTO_COMPRESS=FALSE
-    SOURCE_COMPRESSION=NONE;
+-- Copy manifest.yml, setup.sql, and streamlit files from Git repository
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/native_app_snowmail/
+FILES = ('manifest.yml', 'setup.sql');
 
--- Upload setup.sql
-PUT file:///../native_app_snowmail/setup.sql 
-    @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/ 
-    OVERWRITE=TRUE 
-    AUTO_COMPRESS=FALSE
-    SOURCE_COMPRESSION=NONE;
-
--- Upload Streamlit email_viewer.py
-PUT file:///../native_app_snowmail/streamlit/email_viewer.py 
-    @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/streamlit/ 
-    OVERWRITE=TRUE 
-    AUTO_COMPRESS=FALSE
-    SOURCE_COMPRESSION=NONE;
+-- Copy email_viewer.py to streamlit subdirectory
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/streamlit/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/native_app_snowmail/streamlit/
+FILES = ('email_viewer.py');
 
 -- Verify files uploaded
 LIST @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE;

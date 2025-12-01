@@ -10,24 +10,31 @@ CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK3 DIRECTO
 CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4 DIRECTORY = (ENABLE = TRUE) ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
 CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK5 DIRECTORY = (ENABLE = TRUE) ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
 
-------put notebook files in stages
+------Copy notebook files from Git repository to stages
 
+-- Copy Notebook 1 files
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK1
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
+FILES = ('1_EXTRACT_DATA_FROM_DOCUMENTS.ipynb', 'environment.yml');
 
--- NOTE: Update the path below to match where you downloaded the quickstart package
--- Example: PUT file:///Users/yourname/Downloads/quickstart/assets/notebooks/...
-PUT file:///../Notebooks/1_EXTRACT_DATA_FROM_DOCUMENTS.ipynb @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK1 auto_compress = false overwrite = true;
-PUT file:///../Notebooks/environment.yml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK1 auto_compress = false overwrite = true;
-
-
-PUT file:///../Notebooks/2_ANALYSE_SOUND.ipynb @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK2 auto_compress = false overwrite = true;
-PUT file:///../Notebooks/environment.yml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK2 auto_compress = false overwrite = true;
+-- Copy Notebook 2 files
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK2
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
+FILES = ('2_ANALYSE_SOUND.ipynb', 'environment.yml');
 
 -- Notebook 3 (ML Model) - Uploaded here but deployed in 05b (GPU optional)
-PUT file:///../Notebooks/3_BUILD_A_QUANTITIVE_MODEL.ipynb @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK3 auto_compress = false overwrite = true;
-PUT file:///../Notebooks/ds_environment.yml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK3 auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK3
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
+FILES = ('3_BUILD_A_QUANTITIVE_MODEL.ipynb', 'ds_environment.yml');
 
-PUT file:///../Notebooks/4_CREATE_SEARCH_SERVICE.ipynb @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4 auto_compress = false overwrite = true;
-PUT file:///../Notebooks/environment.yml @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4 auto_compress = false overwrite = true;
+-- Copy Notebook 4 files
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/
+FILES = ('4_CREATE_SEARCH_SERVICE.ipynb', 'environment.yml');
 
 -- Notebook 5 removed (only deploying 4 core notebooks in quickstart)
 

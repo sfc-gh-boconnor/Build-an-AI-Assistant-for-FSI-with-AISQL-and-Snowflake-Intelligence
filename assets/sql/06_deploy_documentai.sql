@@ -13,8 +13,11 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.analyst_reports
   DIRECTORY = (enable = true)
   ENCRYPTION = (type = 'snowflake_sse');
 
-
-PUT file:///../documents/analyst_reports/*.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.analyst_reports auto_compress = false overwrite = true;
+-- Copy analyst report PDFs from Git repository
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.analyst_reports
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/analyst_reports/
+PATTERN = '.*\\.pdf';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.analyst_reports REFRESH;
 
@@ -22,7 +25,11 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.earnings_calls
   DIRECTORY = (enable = true)
   ENCRYPTION = (type = 'snowflake_sse');
 
-PUT file:///../documents/audio/*.mp3 @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.earnings_calls auto_compress = false overwrite = true;
+-- Copy audio files from Git repository
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.earnings_calls
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/audio/
+PATTERN = '.*\\.mp3';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.earnings_calls REFRESH;
 
@@ -31,7 +38,10 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.financial_reports
   ENCRYPTION = (type = 'snowflake_sse');
 
 -- Upload simplified financial reports optimized for AI_EXTRACT table extraction
-PUT file:///../documents/financial_reports/*.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.financial_reports auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.financial_reports
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/financial_reports/
+PATTERN = '.*\\.pdf';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.financial_reports REFRESH;
 
@@ -40,7 +50,10 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.infographics
   ENCRYPTION = (type = 'snowflake_sse');
 
 -- Upload infographic PNG files for all 8 companies
-PUT file:///../documents/infographics/*.png @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.infographics auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.infographics
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/infographics/
+PATTERN = '.*\\.png';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.infographics REFRESH;
 
@@ -58,10 +71,10 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.investment_management
   COMMENT = 'Investment management research papers from Federal Reserve and NBER - portfolio optimization, asset allocation, risk management, ESG investing';
 
 -- Upload investment management PDF documents
-PUT file:///../documents/investment_research/*.pdf 
-    @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.investment_management 
-    auto_compress = false 
-    overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.investment_management
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/investment_research/
+PATTERN = '.*\\.pdf';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.investment_management REFRESH;
 
@@ -82,30 +95,40 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS
   COMMENT = 'Annual Reports FY2024 and FY2025 - 11 companies with financial data, charts, competitive analysis, and NRNT collapse storyline';
 
 -- Upload FY2025 Annual Reports (11 comprehensive reports with charts)
-PUT file:///../documents/annual_reports/SNOW_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/NRNT_Liquidation_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/ICBG_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/QRYQ_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/DFLX_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/STRM_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/VLTA_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/CTLG_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/PROP_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/GAME_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/MKTG_Annual_Report_FY2025.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2025/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/annual_reports/
+FILES = (
+    'SNOW_Annual_Report_FY2025.pdf',
+    'NRNT_Liquidation_Report_FY2025.pdf',
+    'ICBG_Annual_Report_FY2025.pdf',
+    'QRYQ_Annual_Report_FY2025.pdf',
+    'DFLX_Annual_Report_FY2025.pdf',
+    'STRM_Annual_Report_FY2025.pdf',
+    'VLTA_Annual_Report_FY2025.pdf',
+    'CTLG_Annual_Report_FY2025.pdf',
+    'PROP_Annual_Report_FY2025.pdf',
+    'GAME_Annual_Report_FY2025.pdf',
+    'MKTG_Annual_Report_FY2025.pdf'
+);
 
 -- Upload FY2024 Annual Reports (11 pre-collapse reports)
-PUT file:///../documents/annual_reports/SNOW_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/NRNT_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/ICBG_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/QRYQ_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/DFLX_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/STRM_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/VLTA_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/CTLG_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/PROP_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/GAME_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
-PUT file:///../documents/annual_reports/MKTG_Annual_Report_FY2024.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS/FY2024/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/annual_reports/
+FILES = (
+    'SNOW_Annual_Report_FY2024.pdf',
+    'NRNT_Annual_Report_FY2024.pdf',
+    'ICBG_Annual_Report_FY2024.pdf',
+    'QRYQ_Annual_Report_FY2024.pdf',
+    'DFLX_Annual_Report_FY2024.pdf',
+    'STRM_Annual_Report_FY2024.pdf',
+    'VLTA_Annual_Report_FY2024.pdf',
+    'CTLG_Annual_Report_FY2024.pdf',
+    'PROP_Annual_Report_FY2024.pdf',
+    'GAME_Annual_Report_FY2024.pdf',
+    'MKTG_Annual_Report_FY2024.pdf'
+);
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANNUAL_REPORTS REFRESH;
 
@@ -126,17 +149,22 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS
   COMMENT = 'Executive team biographies with AI-generated portraits - Leadership bios for all 11 companies (~30 executives total)';
 
 -- Upload Executive Team Bio PDFs
-PUT file:///../documents/executive_bios/SNOW_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/NRNT_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/ICBG_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/QRYQ_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/DFLX_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/STRM_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/VLTA_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/CTLG_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/PROP_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/GAME_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
-PUT file:///../documents/executive_bios/MKTG_Executive_Team.pdf @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/executive_bios/
+FILES = (
+    'SNOW_Executive_Team.pdf',
+    'NRNT_Executive_Team.pdf',
+    'ICBG_Executive_Team.pdf',
+    'QRYQ_Executive_Team.pdf',
+    'DFLX_Executive_Team.pdf',
+    'STRM_Executive_Team.pdf',
+    'VLTA_Executive_Team.pdf',
+    'CTLG_Executive_Team.pdf',
+    'PROP_Executive_Team.pdf',
+    'GAME_Executive_Team.pdf',
+    'MKTG_Executive_Team.pdf'
+);
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_BIOS REFRESH;
 
@@ -158,37 +186,70 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS
 
 -- Upload Executive Portraits (preserving company directory structure)
 -- SNOW
-PUT file:///../documents/portraits/SNOW/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/SNOW/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/SNOW/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/SNOW/
+PATTERN = '.*';
 
 -- NRNT
-PUT file:///../documents/portraits/NRNT/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/NRNT/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/NRNT/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/NRNT/
+PATTERN = '.*';
 
 -- ICBG
-PUT file:///../documents/portraits/ICBG/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/ICBG/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/ICBG/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/ICBG/
+PATTERN = '.*';
 
 -- QRYQ
-PUT file:///../documents/portraits/QRYQ/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/QRYQ/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/QRYQ/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/QRYQ/
+PATTERN = '.*';
 
 -- DFLX
-PUT file:///../documents/portraits/DFLX/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/DFLX/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/DFLX/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/DFLX/
+PATTERN = '.*';
 
 -- STRM
-PUT file:///../documents/portraits/STRM/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/STRM/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/STRM/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/STRM/
+PATTERN = '.*';
 
 -- VLTA
-PUT file:///../documents/portraits/VLTA/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/VLTA/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/VLTA/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/VLTA/
+PATTERN = '.*';
 
 -- CTLG
-PUT file:///../documents/portraits/CTLG/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/CTLG/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/CTLG/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/CTLG/
+PATTERN = '.*';
 
 -- PROP
-PUT file:///../documents/portraits/PROP/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/PROP/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/PROP/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/PROP/
+PATTERN = '.*';
 
 -- GAME
-PUT file:///../documents/portraits/GAME/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/GAME/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/GAME/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/GAME/
+PATTERN = '.*';
 
 -- MKTG
-PUT file:///../documents/portraits/MKTG/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/MKTG/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS/MKTG/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/portraits/MKTG/
+PATTERN = '.*';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.EXECUTIVE_PORTRAITS REFRESH;
 
@@ -209,7 +270,10 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.INTERVIEWS
   COMMENT = 'Executive interviews and investigative journalism - MP3 audio files including NRNT CEO post-collapse interview';
 
 -- Upload Interview Audio Files
-PUT file:///../documents/audio/*.mp3 @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.INTERVIEWS/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.INTERVIEWS/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/audio/
+PATTERN = '.*\\.mp3';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.INTERVIEWS REFRESH;
 
@@ -244,7 +308,10 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.SOCIAL_MEDIA_IMAGES
   COMMENT = 'Social media images - 7 PNG files showing complete NRNT narrative arc including viral Chinese mother story (~338 posts with images, visual story of rise and fall)';
 
 -- Upload social media images
-PUT file:///../documents/social_media_images/*.* @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.SOCIAL_MEDIA_IMAGES/ auto_compress = false overwrite = true;
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.SOCIAL_MEDIA_IMAGES/
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/documents/social_media_images/
+PATTERN = '.*';
 
 ALTER STAGE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.SOCIAL_MEDIA_IMAGES REFRESH;
 
