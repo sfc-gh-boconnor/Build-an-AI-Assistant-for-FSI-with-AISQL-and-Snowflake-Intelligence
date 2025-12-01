@@ -178,7 +178,7 @@ USE SCHEMA GIT_REPOS;
 -- Create API integration for GitHub
 CREATE OR REPLACE API INTEGRATION git_api_integration
     API_PROVIDER = git_https_api
-    API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+    API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-boconnor/')
     ENABLED = TRUE;
 
 -- Grant usage on API integration
