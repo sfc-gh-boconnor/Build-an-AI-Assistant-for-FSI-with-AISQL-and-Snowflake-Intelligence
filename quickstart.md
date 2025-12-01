@@ -285,6 +285,13 @@ Open Snowflake UI → **SQL Worksheet** and run:
 ```sql
 USE ROLE ACCOUNTADMIN;
 
+-- Create database and schema for Git repository
+CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
+CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.GIT_REPOS;
+
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA GIT_REPOS;
+
 -- Create API integration for GitHub
 CREATE OR REPLACE API INTEGRATION git_api_integration
     API_PROVIDER = git_https_api
@@ -293,13 +300,13 @@ CREATE OR REPLACE API INTEGRATION git_api_integration
     COMMENT = 'GitHub integration for Snowflake Labs repositories';
 
 -- Create Git repository object
-CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
     API_INTEGRATION = git_api_integration
     ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
     COMMENT = 'FSI AI Assistant Quickstart';
 
 -- Fetch code from GitHub
-ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
 
 -- Verify setup
 SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
@@ -310,7 +317,7 @@ SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
 ### Step 2: Browse Repository in Snowflake UI
 
 1. Navigate to: **Projects** → **Git Repositories**
-2. Click on: **ACCELERATE_AI_IN_FSI_REPO**
+2. Click on: **ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO**
 3. Explore the file structure:
    - `assets/sql/` - Deployment scripts
    - `assets/data/` - Data files
@@ -324,18 +331,18 @@ SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
 
 ```sql
 -- Execute deployment scripts directly from GitHub
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
 
 -- OPTIONAL: Only run if GPU available in your region
--- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
 
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
 ```
 
 **Method B: Use Git Repositories UI** (interactive):
@@ -360,17 +367,17 @@ To pull latest changes from GitHub:
 
 ```sql
 USE ROLE ACCOUNTADMIN;
-ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
 ```
 
 ### List Available Files
 
 ```sql
 -- See all SQL scripts
-LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
 
 -- See data files
-LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
 ```
 
 ---

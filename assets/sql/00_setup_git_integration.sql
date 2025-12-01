@@ -13,7 +13,17 @@
 USE ROLE ACCOUNTADMIN;
 
 -- =====================================================
--- Step 1: Create API Integration for GitHub
+-- Step 1: Create Database and Schema for Git Repository
+-- =====================================================
+
+CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
+CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.GIT_REPOS;
+
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA GIT_REPOS;
+
+-- =====================================================
+-- Step 2: Create API Integration for GitHub
 -- =====================================================
 
 CREATE OR REPLACE API INTEGRATION git_api_integration
@@ -26,10 +36,10 @@ CREATE OR REPLACE API INTEGRATION git_api_integration
 DESCRIBE API INTEGRATION git_api_integration;
 
 -- =====================================================
--- Step 2: Create Git Repository Object
+-- Step 3: Create Git Repository Object
 -- =====================================================
 
-CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
     API_INTEGRATION = git_api_integration
     ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
     COMMENT = 'FSI AI Assistant Quickstart - Complete Package';
@@ -38,32 +48,32 @@ CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
 SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
 
 -- =====================================================
--- Step 3: Fetch Latest Code from GitHub
+-- Step 4: Fetch Latest Code from GitHub
 -- =====================================================
 
 -- Fetch the main branch
-ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
 
 -- View repository status
-SHOW GIT BRANCHES IN ACCELERATE_AI_IN_FSI_REPO;
-SHOW GIT TAGS IN ACCELERATE_AI_IN_FSI_REPO;
+SHOW GIT BRANCHES IN ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
+SHOW GIT TAGS IN ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
 
 -- =====================================================
--- Step 4: List Available Files
+-- Step 5: List Available Files
 -- =====================================================
 
 -- See all SQL files available from GitHub
-LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
 
 -- See all data files
-LS @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
 
 -- =====================================================
 -- SETUP COMPLETE!
 -- =====================================================
 
 SELECT 'Git integration setup complete!' AS status,
-       'Repository: ACCELERATE_AI_IN_FSI_REPO' AS git_repo,
+       'Repository: ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO' AS git_repo,
        'Branch: main' AS branch,
        'Next: Run deployment scripts from Git repository' AS next_step;
 
@@ -73,14 +83,14 @@ SELECT 'Git integration setup complete!' AS status,
 --
 -- Option 1: Execute SQL scripts directly from GitHub
 -- --------------------------------------------------
--- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
--- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
 -- ... continue with 03-08
 --
 -- Option 2: Use Snowsight Git Repositories UI
 -- -------------------------------------------
 -- 1. Navigate to: Projects > Git Repositories
--- 2. Click on: ACCELERATE_AI_IN_FSI_REPO
+-- 2. Click on: ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
 -- 3. Browse to: assets/sql/
 -- 4. Open each SQL file (01-08)
 -- 5. Click "Run" or copy to worksheet
