@@ -36,10 +36,11 @@ In this quickstart, you'll build a comprehensive AI-powered financial analysis p
 ### What You'll Need
 
 - A Snowflake account (free trial works!) with **ACCOUNTADMIN** access
-- **SnowCLI** installed (`pip install snowflake-cli-labs`)
+- Web browser (Chrome, Firefox, or Safari)
 - Basic knowledge of SQL
-- Familiarity with Python (for notebooks, optional)
 - 15-20 minutes for deployment
+
+**No downloads or CLI tools required!** Deploy directly from GitHub using Snowflake's Git integration.
 
 ### What You'll Build
 
@@ -150,17 +151,22 @@ Duration: 10
 3. Choose **Enterprise** edition
 4. Select a cloud region (AWS, Azure, or GCP)
 5. Verify your email
+6. Log in to Snowsight (https://app.snowflake.com)
 
 **Option B - Existing Account**:
 - Use any Snowflake account with ACCOUNTADMIN access
+- Log in to Snowsight
 - No special setup required
 
-### Step 2: Setup Git Integration (Recommended)
+### Step 2: Connect to GitHub Repository in Snowflake
 
-**Deploy directly from GitHub in Snowflake UI - No downloads needed!**
+**Deploy directly from GitHub - No downloads or CLI tools needed!**
 
-1. Open Snowflake UI → **SQL Worksheet**
-2. Copy and paste this script:
+#### Step 2a: Create Git Integration (One-Time Setup)
+
+1. In **Snowsight**, click the **"+ Create"** button (top right)
+2. Select **SQL Worksheet**
+3. Copy and paste this script:
 
 ```sql
 -- Setup Git Integration (one-time)
@@ -198,12 +204,42 @@ ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FE
 SELECT 'Git integration ready!' AS status;
 ```
 
-3. Run the script
-4. ✅ **Done!** You're now connected to GitHub
+4. Click **Run** (or press Cmd/Ctrl + Enter)
+5. Wait for completion (~30 seconds)
+6. ✅ **Git integration complete!** You're now connected to GitHub
+
+#### Step 2b: Access Git Repository in Snowflake UI
+
+Now navigate to the Git repository you just created:
+
+1. Click **Projects** in the left sidebar
+2. Click **Git Repositories**
+3. You'll see: **ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO**
+4. Click on the repository name
+
+**You should see the repository file structure:**
+```
+├── README.md
+├── quickstart.md
+├── DEPLOYMENT_ORDER.md
+├── LICENSE
+└── assets/
+    ├── sql/           ← Deployment scripts (START HERE)
+    ├── data/          ← CSV/Parquet files
+    ├── documents/     ← PDFs, images, audio
+    ├── Notebooks/     ← Jupyter notebooks
+    ├── Streamlit/     ← Streamlit app
+    └── ...
+```
+
+5. **Navigate to `assets/sql/`** - This is where the deployment scripts are
+6. You'll see 10 SQL files (00-08 + 05b)
+
+✅ **You're now ready to deploy!**
 
 ---
 
-### Step 3: Deploy from GitHub
+### Step 3: Deploy from GitHub (Choose Method)
 
 **Option A: Execute all at once** (in one worksheet):
 
