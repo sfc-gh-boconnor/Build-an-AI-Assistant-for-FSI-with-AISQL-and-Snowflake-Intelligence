@@ -41,7 +41,7 @@ DESCRIBE API INTEGRATION git_api_integration;
 
 CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
     API_INTEGRATION = git_api_integration
-    ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
+    ORIGIN = 'https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
     COMMENT = 'FSI AI Assistant Quickstart - Complete Package';
 
 -- Verify repository created

@@ -187,7 +187,7 @@ GRANT USAGE ON INTEGRATION git_api_integration TO ROLE ACCOUNTADMIN;
 -- Create Git repository object (fully qualified name)
 CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
     API_INTEGRATION = git_api_integration
-    ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git';
+    ORIGIN = 'https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git';
 
 -- Grant READ permission on Git repository
 GRANT READ ON GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO TO ROLE ACCOUNTADMIN;
@@ -250,8 +250,8 @@ If you prefer local deployment:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
-cd sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence
+git clone https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
+cd Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence
 
 # 2. Install SnowCLI
 pip install snowflake-cli-labs
