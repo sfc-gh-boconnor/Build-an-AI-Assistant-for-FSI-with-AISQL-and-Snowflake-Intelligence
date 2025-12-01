@@ -114,7 +114,45 @@ quickstart/
 
 ## Deployment
 
-### Option 1: Using SnowCLI (Recommended)
+### Option 1: Git Integration (Recommended - No Downloads!)
+
+Deploy directly from GitHub within Snowflake UI:
+
+**Step 1**: Setup Git integration (one-time):
+
+```sql
+-- Open Snowflake UI → SQL Worksheet
+-- Copy/paste and run: assets/sql/00_setup_git_integration.sql
+-- (Or see GIT_INTEGRATION_GUIDE.md for manual setup)
+```
+
+**Step 2**: Run deployment scripts from GitHub:
+
+```sql
+-- Execute all scripts directly from GitHub
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+-- Skip 05b if GPU not available:
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
+```
+
+**Benefits**:
+- ✅ No file downloads needed
+- ✅ Always latest version from GitHub
+- ✅ Browser-only deployment
+- ✅ See full documentation in Git UI
+
+**See**: [GIT_INTEGRATION_GUIDE.md](GIT_INTEGRATION_GUIDE.md) for detailed instructions
+
+---
+
+### Option 2: Using SnowCLI
 
 ```bash
 cd assets/sql
@@ -136,21 +174,14 @@ snow sql -f 08_setup_ml_infrastructure.sql -c <connection>
 - Run scripts in numerical order (00 through 08)
 - Script **05b** is OPTIONAL - skip if GPU_NV_S not available in your region
 
-### Option 2: Snowflake UI (No CLI Required)
+---
 
-1. Open Snowflake UI → SQL Worksheet
-2. Copy contents of each SQL file in order:
-   - `00_config.sql` → Run
-   - `01_configure_account.sql` → Run
-   - `02_data_foundation.sql` → Run
-   - `03_deploy_cortex_analyst.sql` → Run
-   - `04_deploy_streamlit.sql` → Run
-   - `05_deploy_notebooks.sql` → Run
-   - `05b_deploy_gpu_notebook.sql` → Run (OPTIONAL - skip if GPU unavailable)
-   - `06_deploy_documentai.sql` → Run
-   - `07_deploy_snowmail.sql` → Run
-   - `08_setup_ml_infrastructure.sql` → Run
-3. Wait for each script to complete before running the next
+### Option 3: Snowflake UI with Downloaded Files
+
+1. Download/clone this repository
+2. Open Snowflake UI → SQL Worksheet
+3. Copy contents of each SQL file in order (01 → 08, 05b optional)
+4. Run each script and wait for completion
 
 **Deployment time**: 15-20 minutes total
 

@@ -155,81 +155,105 @@ Duration: 10
 - Use any Snowflake account with ACCOUNTADMIN access
 - No special setup required
 
-### Step 2: Install SnowCLI
+### Step 2: Setup Git Integration (Recommended)
 
-Install the Snowflake CLI tool:
+**Deploy directly from GitHub in Snowflake UI - No downloads needed!**
 
-```bash
-pip install snowflake-cli-labs
+1. Open Snowflake UI → **SQL Worksheet**
+2. Copy and paste this script:
+
+```sql
+-- Setup Git Integration (one-time)
+-- Full script available at: assets/sql/00_setup_git_integration.sql
+
+USE ROLE ACCOUNTADMIN;
+
+CREATE OR REPLACE API INTEGRATION git_api_integration
+    API_PROVIDER = git_https_api
+    API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+    ENABLED = TRUE;
+
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO
+    API_INTEGRATION = git_api_integration
+    ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git';
+
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI_REPO FETCH;
+
+SELECT 'Git integration ready!' AS status;
 ```
 
-Verify installation:
-```bash
-snow --version
+3. Run the script
+4. ✅ **Done!** You're now connected to GitHub
+
+**See**: [GIT_INTEGRATION_GUIDE.md](GIT_INTEGRATION_GUIDE.md) for detailed instructions
+
+---
+
+### Step 3: Deploy from GitHub
+
+**Option A: Execute all at once** (in one worksheet):
+
+```sql
+-- Run deployment scripts directly from GitHub
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+-- Optional GPU notebook (skip if unavailable):
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
 ```
 
-### Step 3: Clone the Repository
+**Option B: Use Git Repositories UI** (interactive):
 
-```bash
-git clone https://github.com/Snowflake-Labs/sfguide-build-ai-assistant-fsi-cortex.git
-cd sfguide-build-ai-assistant-fsi-cortex
-```
+1. Navigate: **Projects** → **Git Repositories** → **ACCELERATE_AI_IN_FSI_REPO**
+2. Browse to: `assets/sql/`
+3. Right-click each file (01-08) → "Open in new worksheet"
+4. Execute each script in order
 
-### Step 4: Configure SnowCLI Connection
-
-Set up your Snowflake connection:
-
-```bash
-snow connection add
-```
-
-You'll be prompted for:
-- **Connection name**: `fsi_quickstart` (or any name)
-- **Account**: `<your_account>.snowflakecomputing.com`
-- **Username**: Your Snowflake username
-- **Password**: Your password
-- **Role**: `ACCOUNTADMIN`
-- **Warehouse**: `COMPUTE_WH` (free trial default)
-
-Test the connection:
-```bash
-snow connection test -c fsi_quickstart
-```
-
-You should see: `Connection successful!`
-
-### Step 5: Quick Deploy (One Command!)
-
-Deploy everything with a single command:
-
-```bash
-./quickstart_deploy.sh
-```
-
-**Or manually**:
-
-```bash
-# Generate deployment files
-./deploy.sh
-
-# Deploy to Snowflake
-snow sql -f deployment/deploy_all.sql -c fsi_quickstart
-```
-
-**What happens**:
-1. ✅ Creates database `ACCELERATE_AI_IN_FSI`
-2. ✅ Creates role `ATTENDEE_ROLE` with CORTEX_USER privileges
-3. ✅ Loads 19 CSV files (~5,000 rows of data)
-4. ✅ Creates 20+ tables
-5. ✅ Builds 5 Cortex Search Services
-6. ✅ Deploys 2 Cortex Analyst Semantic Views
-7. ✅ Configures One Ticker agent
-8. ✅ Deploys StockOne Streamlit app
-9. ✅ Uploads 4 Snowflake notebooks
+**What gets deployed**:
+1. ✅ Database `ACCELERATE_AI_IN_FSI` with 3 schemas
+2. ✅ Role `ATTENDEE_ROLE` with CORTEX_USER privileges
+3. ✅ 20+ tables with ~10,000 rows of data
+4. ✅ 5 Cortex Search Services
+5. ✅ 2 Cortex Analyst Semantic Views
+6. ✅ 1 Snowflake Intelligence Agent (8 tools)
+7. ✅ 1 Streamlit application (StockOne)
+8. ✅ 4 Snowflake Notebooks
+9. ✅ 132 documents uploaded to stages
+10. ✅ 1 SnowMail Native App
 
 **Deployment time**: 15-20 minutes
 
-### Step 6: Verify Deployment
+---
+
+### Alternative: Download and Deploy with SnowCLI
+
+If you prefer local deployment:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
+cd sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence
+
+# 2. Install SnowCLI
+pip install snowflake-cli-labs
+
+# 3. Configure connection
+snow connection add
+
+# 4. Deploy
+cd assets/sql
+snow sql -f 01_configure_account.sql -c <connection>
+# ... continue with 02-08
+```
+
+---
+
+### Step 4: Verify Deployment
 
 After deployment completes, verify in Snowflake UI:
 
