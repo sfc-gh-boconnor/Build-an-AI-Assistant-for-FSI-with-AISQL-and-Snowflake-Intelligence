@@ -48,7 +48,17 @@ CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN
 SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
 
 -- =====================================================
--- Step 4: Fetch Latest Code from GitHub
+-- Step 4: Grant Permissions on Git Repository
+-- =====================================================
+
+-- Grant READ on the Git repository to ACCOUNTADMIN
+GRANT READ ON GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO TO ROLE ACCOUNTADMIN;
+
+-- Grant WRITE if you need to push changes (optional for quickstart)
+-- GRANT WRITE ON GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO TO ROLE ACCOUNTADMIN;
+
+-- =====================================================
+-- Step 5: Fetch Latest Code from GitHub
 -- =====================================================
 
 -- Fetch the main branch
@@ -59,7 +69,7 @@ SHOW GIT BRANCHES IN ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
 SHOW GIT TAGS IN ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
 
 -- =====================================================
--- Step 5: List Available Files
+-- Step 6: List Available Files
 -- =====================================================
 
 -- See all SQL files available from GitHub
