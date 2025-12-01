@@ -28,9 +28,9 @@ USE SCHEMA GIT_REPOS;
 
 CREATE OR REPLACE API INTEGRATION git_api_integration
     API_PROVIDER = git_https_api
-    API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+    API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-boconnor/')
     ENABLED = TRUE
-    COMMENT = 'API integration for GitHub - Snowflake Labs repositories';
+    COMMENT = 'API integration for GitHub - sfc-gh-boconnor repositories';
 
 -- Verify integration created
 DESCRIBE API INTEGRATION git_api_integration;
