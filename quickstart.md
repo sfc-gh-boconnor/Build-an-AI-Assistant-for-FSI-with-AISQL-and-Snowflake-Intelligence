@@ -86,64 +86,47 @@ This quickstart deploys a **complete multi-modal AI platform** combining:
 
 ### System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    SNOWFLAKE CORTEX AI PLATFORM                      │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────────┐  │
-│  │   Document AI    │  │  Audio Analysis  │  │  Market Data    │  │
-│  ├──────────────────┤  ├──────────────────┤  ├─────────────────┤  │
-│  │ • PDF Parsing    │  │ • AI Transcribe  │  │ • Stock Prices  │  │
-│  │ • HTML Extract   │  │ • AI Sentiment   │  │ • Parquet Load  │  │
-│  │ • 850 Reports    │  │ • 3 Calls        │  │ • 6,420 rows    │  │
-│  │ • AI_EXTRACT     │  │ • Speaker ID     │  │ • Pivot Table   │  │
-│  └────────┬─────────┘  └────────┬─────────┘  └────────┬────────┘  │
-│           │                     │                      │            │
-│           └─────────────────────┼──────────────────────┘            │
-│                                 │                                   │
-│           ┌─────────────────────▼──────────────────────┐            │
-│           │         DATA FOUNDATION (20+ Tables)       │            │
-│           │  • Transcripts  • Reports  • Emails        │            │
-│           │  • Sentiment    • Metrics  • Embeddings    │            │
-│           └─────────────────────┬──────────────────────┘            │
-│                                 │                                   │
-│       ┌─────────────────────────┼─────────────────────────┐         │
-│       │                         │                         │         │
-│  ┌────▼─────────┐   ┌──────────▼──────────┐   ┌────────▼──────┐  │
-│  │ Cortex Search│   │  Cortex Analyst     │   │  ML Models    │  │
-│  ├──────────────┤   ├─────────────────────┤   ├───────────────┤  │
-│  │ 5 Services:  │   │ 2 Semantic Views:   │   │ • Training    │  │
-│  │ • Sentiment  │   │ • 11 Companies      │   │ • GPU Accel   │  │
-│  │ • Reports    │   │ • Snowflake Data    │   │ • Prediction  │  │
-│  │ • Emails     │   │ • TICKER_SNOW       │   │ • Registry    │  │
-│  │ • Calls      │   │   Filter            │   │               │  │
-│  │ • Graphics   │   │                     │   │               │  │
-│  └──────┬───────┘   └──────────┬──────────┘   └───────┬───────┘  │
-│         │                      │                      │            │
-│         └──────────────────────┼──────────────────────┘            │
-│                                │                                   │
-│                    ┌───────────▼──────────┐                        │
-│                    │  SNOWFLAKE           │                        │
-│                    │  INTELLIGENCE        │                        │
-│                    │  (One Ticker Agent)  │                        │
-│                    ├──────────────────────┤                        │
-│                    │ • 5 Search Tools     │                        │
-│                    │ • 2 Analyst Tools    │                        │
-│                    │ • WEB_SEARCH Tool    │                        │
-│                    │ • REST API           │                        │
-│                    └───────────┬──────────┘                        │
-│                                │                                   │
-│                    ┌───────────▼──────────┐                        │
-│                    │  STOCKONE STREAMLIT  │                        │
-│                    │  APPLICATION         │                        │
-│                    ├──────────────────────┤                        │
-│                    │ • Chat Interface     │                        │
-│                    │ • Tool Toggles       │                        │
-│                    │ • Visualizations     │                        │
-│                    │ • Feedback API       │                        │
-│                    └──────────────────────┘                        │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Platform["SNOWFLAKE CORTEX AI PLATFORM"]
+        subgraph DataSources["Data Sources"]
+            DocAI["Document AI<br/>• PDF Parsing<br/>• HTML Extract<br/>• 850 Reports<br/>• AI_EXTRACT"]
+            Audio["Audio Analysis<br/>• AI Transcribe<br/>• AI Sentiment<br/>• 3 Calls<br/>• Speaker ID"]
+            Market["Market Data<br/>• Stock Prices<br/>• Parquet Load<br/>• 6,420 rows<br/>• Pivot Table"]
+        end
+        
+        DataFoundation["DATA FOUNDATION<br/>20+ Tables<br/>• Transcripts • Reports • Emails<br/>• Sentiment • Metrics • Embeddings"]
+        
+        subgraph AIServices["AI Services Layer"]
+            Search["Cortex Search<br/>5 Services:<br/>• Sentiment<br/>• Reports<br/>• Emails<br/>• Calls<br/>• Graphics"]
+            Analyst["Cortex Analyst<br/>2 Semantic Views:<br/>• 11 Companies<br/>• Snowflake Data<br/>• TICKER_SNOW Filter"]
+            ML["ML Models<br/>• Training<br/>• GPU Accel<br/>• Prediction<br/>• Registry"]
+        end
+        
+        Agent["SNOWFLAKE INTELLIGENCE<br/>One Ticker Agent<br/>• 5 Search Tools<br/>• 2 Analyst Tools<br/>• WEB_SEARCH Tool<br/>• REST API"]
+        
+        App["STOCKONE STREAMLIT<br/>APPLICATION<br/>• Chat Interface<br/>• Tool Toggles<br/>• Visualizations<br/>• Feedback API"]
+        
+        DocAI --> DataFoundation
+        Audio --> DataFoundation
+        Market --> DataFoundation
+        
+        DataFoundation --> Search
+        DataFoundation --> Analyst
+        DataFoundation --> ML
+        
+        Search --> Agent
+        Analyst --> Agent
+        ML --> Agent
+        
+        Agent --> App
+    end
+    
+    style Platform fill:#e3f2fd
+    style DataSources fill:#fff3e0
+    style AIServices fill:#f3e5f5
+    style Agent fill:#e8f5e9
+    style App fill:#fce4ec
 ```
 
 ### Key Technologies
@@ -1143,75 +1126,124 @@ Duration: 10
 
 ### Data Flow
 
-```
-Raw Data Sources
-    │
-    ├─→ PDFs (30 analyst reports) ─→ AI_PARSE_DOCUMENT ─→ PARSED_ANALYST_REPORTS
-    │                               ─→ AI_EXTRACT ──────→ Financial metrics
-    │
-    ├─→ HTML (850 reports) ────────→ AI_EXTRACT ──────→ FINANCIAL_REPORTS (11 companies)
-    │
-    ├─→ MP3 (3 calls) ─────────────→ AI_TRANSCRIBE ───→ TRANSCRIBED_EARNINGS_CALLS
-    │                               ─→ AI_SENTIMENT ───→ Sentiment scores
-    │
-    ├─→ Parquet (stock prices) ────→ Pivot query ─────→ STOCK_PRICES table
-    │
-    └─→ CSV (emails) ──────────────→ AI_EXTRACT ──────→ EMAIL_PREVIEWS_EXTRACTED
-         │
-         ▼
-    Base Tables (20+)
-         │
-         ├─→ Views (6) ──────────────→ Business logic aggregations
-         │
-         ├─→ Search Services (5) ────→ Cortex Search (vector embeddings)
-         │                              │
-         │                              ├─→ RAG applications
-         │                              └─→ Semantic search
-         │
-         ├─→ Semantic Views (2) ──────→ Cortex Analyst (text-to-SQL)
-         │                              │
-         │                              └─→ Natural language queries
-         │
-         └─→ ML Models ─────────────────→ Predictions via SQL UDFs
-              │
-              ▼
-    Applications
-         │
-         ├─→ Snowflake Intelligence (One Ticker Agent)
-         │   - Multi-tool orchestration
-         │   - Conversational AI
-         │   - Web search integration
-         │
-         ├─→ StockOne Streamlit App
-         │   - REST API integration
-         │   - Feedback collection
-         │   - Interactive visualizations
-         │
-         └─→ SnowMail Native App
-             - Email viewer
-             - Portfolio Analytics
+```mermaid
+graph TD
+    subgraph Sources["Raw Data Sources"]
+        PDF["PDFs<br/>30 analyst reports"]
+        HTML["HTML<br/>850 reports"]
+        MP3["MP3<br/>3 calls"]
+        PARQ["Parquet<br/>stock prices"]
+        CSV["CSV<br/>emails"]
+    end
+    
+    subgraph Processing["AI Processing"]
+        PARSE["AI_PARSE_DOCUMENT"]
+        EXTRACT1["AI_EXTRACT"]
+        EXTRACT2["AI_EXTRACT"]
+        TRANSCRIBE["AI_TRANSCRIBE"]
+        SENTIMENT["AI_SENTIMENT"]
+        PIVOT["Pivot Query"]
+        EXTRACT3["AI_EXTRACT"]
+    end
+    
+    subgraph Tables["Base Tables (20+)"]
+        REPORTS["PARSED_ANALYST_REPORTS<br/>+ Financial Metrics"]
+        FIN["FINANCIAL_REPORTS<br/>11 companies"]
+        TRANS["TRANSCRIBED_EARNINGS_CALLS<br/>+ Sentiment scores"]
+        STOCK["STOCK_PRICES table"]
+        EMAIL["EMAIL_PREVIEWS_EXTRACTED"]
+    end
+    
+    subgraph Analytics["Analytics Layer"]
+        VIEWS["Views (6)<br/>Business logic"]
+        SEARCH["Search Services (5)<br/>Cortex Search<br/>Vector embeddings"]
+        SEMANTIC["Semantic Views (2)<br/>Cortex Analyst<br/>Text-to-SQL"]
+        MLMOD["ML Models<br/>Predictions via SQL UDFs"]
+    end
+    
+    subgraph Apps["Applications"]
+        INTEL["Snowflake Intelligence<br/>One Ticker Agent<br/>• Multi-tool orchestration<br/>• Conversational AI<br/>• Web search"]
+        STLIT["StockOne Streamlit<br/>• REST API integration<br/>• Feedback collection<br/>• Visualizations"]
+        MAIL["SnowMail Native App<br/>• Email viewer<br/>• Portfolio Analytics"]
+    end
+    
+    PDF --> PARSE --> REPORTS
+    PDF --> EXTRACT1 --> REPORTS
+    HTML --> EXTRACT2 --> FIN
+    MP3 --> TRANSCRIBE --> TRANS
+    MP3 --> SENTIMENT --> TRANS
+    PARQ --> PIVOT --> STOCK
+    CSV --> EXTRACT3 --> EMAIL
+    
+    REPORTS --> VIEWS
+    FIN --> VIEWS
+    TRANS --> VIEWS
+    STOCK --> VIEWS
+    EMAIL --> VIEWS
+    
+    REPORTS --> SEARCH
+    FIN --> SEARCH
+    TRANS --> SEARCH
+    EMAIL --> SEARCH
+    
+    REPORTS --> SEMANTIC
+    FIN --> SEMANTIC
+    TRANS --> SEMANTIC
+    STOCK --> SEMANTIC
+    
+    STOCK --> MLMOD
+    
+    SEARCH --> INTEL
+    SEMANTIC --> INTEL
+    MLMOD --> INTEL
+    
+    INTEL --> STLIT
+    INTEL --> MAIL
+    
+    style Sources fill:#fff3e0
+    style Processing fill:#e1f5fe
+    style Tables fill:#f3e5f5
+    style Analytics fill:#e8f5e9
+    style Apps fill:#fce4ec
 ```
 
 ### Security Model
 
-```
-ACCOUNTADMIN
-    │
-    └─→ Creates: ATTENDEE_ROLE
-             │
-             └─→ Owns ALL objects:
-                 ├─→ Database: ACCELERATE_AI_IN_FSI
-                 ├─→ Schemas: DEFAULT_SCHEMA, DOCUMENT_AI, CORTEX_ANALYST
-                 ├─→ Tables: 20+ tables
-                 ├─→ Views: 6 views
-                 ├─→ Search Services: 5 services
-                 ├─→ Semantic Views: 2 views
-                 ├─→ Functions: WEB_SEARCH UDF
-                 ├─→ Procedures: SEND_EMAIL_NOTIFICATION
-                 └─→ Applications: Streamlit, SnowMail
-                      │
-                      └─→ Runs as: ATTENDEE_ROLE
-                          └─→ Full access (owner privileges)
+```mermaid
+graph TD
+    ADMIN["ACCOUNTADMIN"]
+    ROLE["ATTENDEE_ROLE"]
+    
+    subgraph Owned["Objects Owned by ATTENDEE_ROLE"]
+        DB["Database<br/>ACCELERATE_AI_IN_FSI"]
+        SCHEMAS["Schemas<br/>DEFAULT_SCHEMA<br/>DOCUMENT_AI<br/>CORTEX_ANALYST"]
+        TABLES["Tables<br/>20+ tables"]
+        VIEWS["Views<br/>6 views"]
+        SEARCH["Search Services<br/>5 services"]
+        SEM["Semantic Views<br/>2 views"]
+        FUNC["Functions<br/>WEB_SEARCH UDF"]
+        PROC["Procedures<br/>SEND_EMAIL_NOTIFICATION"]
+        APPS["Applications<br/>Streamlit, SnowMail"]
+    end
+    
+    ACCESS["Runs as ATTENDEE_ROLE<br/>Full access (owner privileges)"]
+    
+    ADMIN -->|Creates| ROLE
+    ROLE -->|Owns| DB
+    ROLE -->|Owns| SCHEMAS
+    ROLE -->|Owns| TABLES
+    ROLE -->|Owns| VIEWS
+    ROLE -->|Owns| SEARCH
+    ROLE -->|Owns| SEM
+    ROLE -->|Owns| FUNC
+    ROLE -->|Owns| PROC
+    ROLE -->|Owns| APPS
+    APPS -.->|Executes as| ACCESS
+    
+    style ADMIN fill:#ffebee
+    style ROLE fill:#e8f5e9
+    style Owned fill:#e3f2fd
+    style ACCESS fill:#fff9c4
 ```
 
 **Benefits**:
@@ -1222,21 +1254,35 @@ ACCOUNTADMIN
 
 ### REST API Architecture
 
+```mermaid
+sequenceDiagram
+    participant App as Streamlit App
+    participant API as Cortex Agent REST API
+    participant Agent as One Ticker Agent
+    participant Tools as Agent Tools
+    
+    App->>API: POST /api/v2/cortex/agent:run
+    Note over App,API: Payload: {model, tools,<br/>tool_resources, messages}
+    
+    API->>Agent: Execute agent
+    Agent->>Tools: Use tools (Search, Analyst, ML)
+    Tools-->>Agent: Return results
+    Agent-->>API: Stream response chunks
+    
+    loop Stream Chunks
+        API-->>App: {delta: content}
+        Note over App: Parse: text, tool_results,<br/>suggestions
+    end
+    
+    App->>API: POST /api/v2/cortex/agent/feedback
+    Note over App,API: User feedback (👍👎)
+    API-->>App: Feedback recorded
+    
+    style App fill:#fce4ec
+    style API fill:#e3f2fd
+    style Agent fill:#e8f5e9
+    style Tools fill:#fff3e0
 ```
-Streamlit App (Python)
-    │
-    ├─→ _snowflake.send_snow_api_request()
-    │       │
-    │       └─→ POST /api/v2/cortex/agent:run
-    │           │
-    │           ├─→ Payload: {model, tools, tool_resources, messages}
-    │           │
-    │           └─→ Response: {request_id, content: [{delta}]}
-    │                   │
-    │                   └─→ Streamed chunks parsed
-    │                       └─→ Text, tool_results, suggestions
-    │
-    └─→ Feedback API
         │
         └─→ POST /api/v2/databases/{db}/schemas/{schema}/agents/{name}:feedback
             │
