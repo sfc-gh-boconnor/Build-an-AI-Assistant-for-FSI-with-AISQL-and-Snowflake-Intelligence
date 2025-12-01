@@ -1404,12 +1404,16 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('unique_transcripts.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts;
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/unique_transcripts.csv
+FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts_stage/unique_transcripts.csv
 FILE_FORMAT = (
     TYPE = CSV
     FIELD_DELIMITER = ','
