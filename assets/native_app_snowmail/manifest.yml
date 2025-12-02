@@ -10,14 +10,12 @@ artifacts:
   default_streamlit: app_schema.email_viewer
 
 references:
-  EMAIL_PREVIEWS_TABLE:
-    label: "Email Previews Table"
-    description: "Table containing email previews from Snowflake Intelligence agents"
-    privileges:
-      - SELECT
-      - DELETE
-    object_type: TABLE
-    register_callback: app_schema.register_reference
+  - consumer_data:
+      label: "FSI Data Access"
+      description: "Access to email previews and analytics data"
+      privileges:
+        - USAGE
+      object_type: DATABASE
 
 configuration:
   log_level: INFO
