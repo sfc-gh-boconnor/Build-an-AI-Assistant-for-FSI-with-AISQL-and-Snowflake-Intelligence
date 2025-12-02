@@ -31,9 +31,6 @@ COMMENT = 'Warehouse for Snowflake notebooks';
 
 USE WAREHOUSE DEFAULT_WH;
 
--- Request Cybersyn listing (financial data)
-CALL SYSTEM$REQUEST_LISTING_AND_WAIT('GZTYZ1US93D', 60);
-
 -- =====================================================
 -- Grant Cortex AI privileges to ACCOUNTADMIN
 -- =====================================================
