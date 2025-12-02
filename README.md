@@ -136,7 +136,6 @@ Navigate to: **AI & ML Studio** → **Notebooks**
 quickstart/
 ├── README.md                   → This file
 ├── quickstart.md               → Complete step-by-step guide
-├── FETCH_LATEST_FROM_GIT.sql   → Utility to refresh Git repo
 ├── LICENSE                     → Apache 2.0 license
 │
 └── assets/
