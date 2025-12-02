@@ -1102,7 +1102,7 @@ Duration: 20
 
 The **One Ticker** agent is your AI-powered financial analyst assistant that combines multiple data sources, search capabilities, and analytical tools to provide comprehensive insights about stocks and companies.
 
-![Agent Demo](assets/images/agent/agent_demo.png)
+![Snowflake Intelligence Agent](assets/images/agent/snowflake_intelligence_agent.png)
 
 **What the Agent Can Do**:
 - 📊 Analyze company financial data and performance metrics
