@@ -303,7 +303,7 @@ GRANT SELECT ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SOCIAL_MEDIA_NRNT TO R
 CREATE OR REPLACE PROCEDURE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SEND_EMAIL_NOTIFICATION(
     EMAIL_SUBJECT VARCHAR,
     EMAIL_CONTENT VARCHAR,
-    RECIPIENT_EMAIL VARCHAR DEFAULT 'becky.oconnor@snowflake.com',
+    RECIPIENT_EMAIL VARCHAR DEFAULT 'analyst@oneticker.demo',
     MIME_TYPE VARCHAR DEFAULT 'text/html'
 )
 RETURNS VARCHAR
@@ -332,7 +332,7 @@ def send_email(session: snowpark.Session, email_subject: str, email_content: str
     
     # Use default recipient if none provided
     if not recipient_email or not recipient_email.strip():
-        recipient_email = 'becky.oconnor@snowflake.com'
+        recipient_email = 'analyst@oneticker.demo'
     
     # Generate unique filename
     import time
