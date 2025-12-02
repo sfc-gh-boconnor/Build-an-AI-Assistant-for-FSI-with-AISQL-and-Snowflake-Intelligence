@@ -1,4 +1,4 @@
-manifest_version: 2
+manifest_version: 1
 
 version:
   name: V1_0
@@ -9,17 +9,5 @@ artifacts:
   setup_script: setup.sql
   default_streamlit: app_schema.email_viewer
 
-references:
-  - name: email_table
-    label: "Email Previews Table"
-    description: "Table containing email previews from Snowflake Intelligence agents"
-    object_type: TABLE
-    privileges:
-      - SELECT
-      - DELETE
-    multi_valued: false
-    register_callback: app_schema.register_reference
-
 configuration:
   log_level: INFO
-  trace_level: OFF

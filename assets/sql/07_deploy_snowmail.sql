@@ -1,5 +1,3 @@
-ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"sql"}}''';
-
 -- ========================================
 -- Deploy SnowMail Native App
 -- ========================================
@@ -82,9 +80,6 @@ CREATE APPLICATION SNOWMAIL
 
 -- Ensure EMAIL_PREVIEWS table exists (should be created in script 02)
 -- If script 02 hasn't been run, create a minimal version for SnowMail to work
-USE DATABASE ACCELERATE_AI_IN_FSI;
-USE SCHEMA DEFAULT_SCHEMA;
-
 CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
     EMAIL_ID VARCHAR(100) PRIMARY KEY,
     RECIPIENT_EMAIL VARCHAR(500),
@@ -97,29 +92,18 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 )
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
--- ========================================
--- Step 5: Grant Permissions Required
--- ========================================
+-- Grant database and schema access
+GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
 
--- SnowMail requires permissions to access the EMAIL_PREVIEWS table
--- These must be granted via the Snowflake UI
+-- Grant table permissions on EMAIL_PREVIEWS
+-- SELECT: Read emails for display in UI
+-- DELETE: Allow users to delete emails from inbox
+-- Note: INSERT is handled by SEND_EMAIL_NOTIFICATION procedure, not by the app
+GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
 
-USE ROLE ACCOUNTADMIN;
-
-SELECT '✅ SnowMail Native App deployed successfully!' AS STATUS,
-       'Application: SNOWMAIL' AS APP_NAME,
-       'Package: SNOWMAIL_PKG' AS PACKAGE_NAME,
-       'Version: V1_0' AS VERSION,
-       '' AS BLANK_LINE,
-       '⚠️  NEXT STEP: Grant Permissions via UI' AS IMPORTANT,
-       'Navigate to: Apps → SNOWMAIL → Security tab' AS STEP_1,
-       'Click: Grant or Manage Privileges' AS STEP_2,
-       'Grant these permissions:' AS STEP_3,
-       '  • Database ACCELERATE_AI_IN_FSI (USAGE)' AS GRANT_1,
-       '  • Schema DEFAULT_SCHEMA (USAGE)' AS GRANT_2,
-       '  • Table EMAIL_PREVIEWS (SELECT, DELETE)' AS GRANT_3,
-       '  • Warehouse DEFAULT_WH (USAGE)' AS GRANT_4,
-       'Then refresh the app to view emails!' AS FINAL_STEP;
+-- Grant warehouse access for Streamlit execution
+GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 
 -- ========================================
 -- Deployment Complete

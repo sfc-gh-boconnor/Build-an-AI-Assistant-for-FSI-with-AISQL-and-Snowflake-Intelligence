@@ -133,7 +133,7 @@ graph TB
 ### Key Technologies
 
 - **Cortex AI Functions**: AI_EXTRACT, AI_PARSE_DOCUMENT, AI_TRANSCRIBE, AI_SENTIMENT, AI_COMPLETE
-- **Cortex Search**: 5 search services (created in Notebook 4) for semantic search and RAG
+- **Cortex Search**: 5 search services for semantic search and RAG
 - **Cortex Analyst**: 2 semantic views for natural language SQL
 - **Snowflake Intelligence**: Conversational agents with tool orchestration
 - **Document AI**: Automated document processing at scale
@@ -268,20 +268,42 @@ EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
 1. ✅ Database `ACCELERATE_AI_IN_FSI` with 3 schemas
 2. ✅ Role `ATTENDEE_ROLE` with CORTEX_USER privileges
 3. ✅ 20+ tables with ~10,000 rows of data
-4. ✅ 2 Cortex Analyst Semantic Views
-5. ✅ 1 Snowflake Intelligence Agent
-6. ✅ 2 Streamlit applications
-7. ✅ 4-5 Notebooks (GPU notebook optional)
-8. ✅ 1 Native App (SnowMail email viewer)
-9. ✅ Stages with PDFs, audio files, and images
-
-⚠️ **Note**: Search services are created later in **Notebook 4**, not during initial deployment.
+4. ✅ 5 Cortex Search Services
+5. ✅ 2 Cortex Analyst Semantic Views
+6. ✅ 1 Snowflake Intelligence Agent (8 tools)
+7. ✅ 1 Streamlit application (StockOne)
+8. ✅ 4 Snowflake Notebooks
+9. ✅ 132 documents uploaded to stages
+10. ✅ 1 SnowMail Native App
 
 **Deployment time**: 15-20 minutes
 
 ---
 
-### Step 3: Verify Deployment
+### Alternative: Download and Deploy with SnowCLI
+
+If you prefer local deployment:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
+cd Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence
+
+# 2. Install SnowCLI
+pip install snowflake-cli-labs
+
+# 3. Configure connection
+snow connection add
+
+# 4. Deploy
+cd assets/sql
+snow sql -f 01_configure_account.sql -c <connection>
+# ... continue with 02-08
+```
+
+---
+
+### Step 4: Verify Deployment
 
 After deployment completes, verify in Snowflake UI:
 
@@ -290,21 +312,133 @@ After deployment completes, verify in Snowflake UI:
 USE DATABASE ACCELERATE_AI_IN_FSI;
 
 SHOW TABLES IN SCHEMA DEFAULT_SCHEMA;           -- Should see 20+ tables
+SHOW CORTEX SEARCH SERVICES;                    -- Should see 5 services
 SHOW SEMANTIC VIEWS IN SCHEMA CORTEX_ANALYST;   -- Should see 2 views
 SHOW STREAMLITS IN SCHEMA STREAMLIT;            -- Should see STOCKONE_AGENT
-SHOW NOTEBOOKS IN SCHEMA NOTEBOOKS;             -- Should see 4-5 notebooks
-SHOW AGENTS IN SCHEMA SNOWFLAKE_INTELLIGENCE.AGENTS; -- Should see FSI_STOCK_AGENT
+SHOW NOTEBOOKS IN SCHEMA NOTEBOOKS;             -- Should see 4 notebooks
 ```
 
-⚠️ **Note**: Cortex Search Services will appear **after** you run Notebook 4.
-
 **All set?** ✅ Continue to the next section!
+
+<!-- ------------------------ -->
+## Git Integration Deployment (Alternative)
+Duration: 10
+
+### Deploy Directly from GitHub Without Downloads
+
+Instead of downloading files, you can connect Snowflake directly to this GitHub repository and run scripts from within Snowsight!
+
+### Step 1: Create Git Integration
+
+Open Snowflake UI → **SQL Worksheet** and run:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+
+-- Create database and schema for Git repository
+CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
+CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.GIT_REPOS;
+
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA GIT_REPOS;
+
+-- Create API integration for GitHub
+CREATE OR REPLACE API INTEGRATION git_api_integration
+    API_PROVIDER = git_https_api
+    API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+    ENABLED = TRUE
+    COMMENT = 'GitHub integration for Snowflake Labs repositories';
+
+-- Create Git repository object
+CREATE OR REPLACE GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
+    API_INTEGRATION = git_api_integration
+    ORIGIN = 'https://github.com/Snowflake-Labs/sfguide-Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git'
+    COMMENT = 'FSI AI Assistant Quickstart';
+
+-- Fetch code from GitHub
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
+
+-- Verify setup
+SHOW GIT REPOSITORIES LIKE 'ACCELERATE_AI_IN_FSI_REPO';
+```
+
+✅ **Git integration complete!** Repository is now connected to Snowflake.
+
+### Step 2: Browse Repository in Snowflake UI
+
+1. Navigate to: **Projects** → **Git Repositories**
+2. Click on: **ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO**
+3. Explore the file structure:
+   - `assets/sql/` - Deployment scripts
+   - `assets/data/` - Data files
+   - `assets/documents/` - PDFs, images, audio
+   - `assets/Notebooks/` - Jupyter notebooks
+   - `README.md` - Documentation
+
+### Step 3: Execute Scripts from Git
+
+**Method A: Run all scripts sequentially** (in one worksheet):
+
+```sql
+-- Execute deployment scripts directly from GitHub
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+
+-- OPTIONAL: Only run if GPU available in your region
+-- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
+```
+
+**Method B: Use Git Repositories UI** (interactive):
+
+1. In Git Repositories, navigate to `assets/sql/`
+2. Right-click `01_configure_account.sql` → **"Open in new worksheet"**
+3. Click **Run**
+4. Repeat for scripts 02-08 (and optionally 05b)
+
+### Benefits of Git Integration
+
+- ✅ **No downloads** - Deploy directly from GitHub
+- ✅ **Always current** - `ALTER REPO FETCH` pulls latest code
+- ✅ **Browser-only** - No CLI tools needed
+- ✅ **Integrated** - All in Snowsight UI
+- ✅ **Visual** - Browse files and documentation
+- ✅ **Version control** - See Git history in Snowflake
+
+### Update Repository Anytime
+
+To pull latest changes from GitHub:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
+```
+
+### List Available Files
+
+```sql
+-- See all SQL scripts
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
+
+-- See data files
+LS @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/;
+```
+
+---
+
+> **💡 Tip**: Git integration is the **easiest deployment method** - everything runs in your browser without downloading any files!
 
 <!-- ------------------------ -->
 ## Verify Your Deployment
 Duration: 5
 
-After Git integration deployment completes, let's verify everything was created successfully.
+After deployment completes (using Git integration, SnowCLI, or manual method), let's verify everything was created successfully.
 
 ### Check Database Objects
 
@@ -330,8 +464,8 @@ SHOW TABLES;
 SELECT 'FINANCIAL_REPORTS' AS table_name, COUNT(*) AS rows 
 FROM DOCUMENT_AI.FINANCIAL_REPORTS
 UNION ALL
-SELECT 'EMAIL_PREVIEWS', COUNT(*) 
-FROM DEFAULT_SCHEMA.EMAIL_PREVIEWS
+SELECT 'EMAIL_PREVIEWS_EXTRACTED', COUNT(*) 
+FROM DEFAULT_SCHEMA.EMAIL_PREVIEWS_EXTRACTED
 UNION ALL
 SELECT 'STOCK_PRICES', COUNT(*) 
 FROM DEFAULT_SCHEMA.STOCK_PRICES
@@ -342,14 +476,22 @@ FROM DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT;
 
 **Expected Results**:
 - FINANCIAL_REPORTS: **850 rows** (11 companies)
+- EMAIL_PREVIEWS_EXTRACTED: **950 rows** (11 tickers)
 - STOCK_PRICES: **6,420 rows** (Snowflake stock)
 - TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT: **1,788 rows**
-- EMAIL_PREVIEWS: **324 rows** (email metadata)
 
-⚠️ **Note**: The following are created **during the notebooks**, not during initial deployment:
-- **Notebook 1 creates**: `EMAIL_PREVIEWS_EXTRACTED`, `PARSED_ANALYST_REPORTS`, `AI_EXTRACT_ANALYST_REPORTS_ADVANCED`, `FINANCIAL_REPORTS`, `INFOGRAPHIC_METRICS_EXTRACTED`
-- **Notebook 2 creates**: `TRANSCRIBED_EARNINGS_CALLS`, `SENTIMENT_ANALYSIS`, `TRANSCRIPTS_BY_MINUTE`
-- **Notebook 4 creates**: `call_embeds`, `FULL_TRANSCRIPTS`, `INFOGRAPHICS_FOR_SEARCH`, `SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH`, and all 5 **Cortex Search Services**
+### Verify Search Services (5)
+
+```sql
+SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
+```
+
+You should see 5 services with **ACTIVE** status:
+- ✅ DOW_ANALYSTS_SENTIMENT_ANALYSIS (92 rows)
+- ✅ SNOW_FULL_EARNINGS_CALLS (317 rows)
+- ✅ ANALYST_REPORTS_SEARCH (30 rows)
+- ✅ INFOGRAPHICS_SEARCH (11 rows)
+- ✅ EMAILS (950 rows)
 
 ### Verify Semantic Views (2)
 
@@ -381,597 +523,151 @@ SHOW NOTEBOOKS IN ACCELERATE_AI_IN_FSI.NOTEBOOKS;
 **All verified?** ✅ Let's start using the AI features!
 
 <!-- ------------------------ -->
-## Explore AI & ML Studio
-Duration: 15
+## Extract Data from Documents
+Duration: 10
 
-### Snowflake AI and ML Studio
+### Open Notebook 1: Extract Data from Documents
 
-Before diving into the notebooks, let's explore the **AI & ML Studio** - your one-stop shop for trying out AI functions using a user-friendly UI.
+Navigate to **Notebooks** in Snowflake:
 
-Navigate to the **AI & ML** section in the Snowflake navigation bar.
+```
+AI & ML Studio → Notebooks → 1_EXTRACT_DATA_FROM_DOCUMENTS
+```
 
-![AI & ML Studio](assets/images/playground/ai_ml_studio.png)
+### What This Notebook Does
 
-### Features You'll Explore
+#### Document AI Processing
 
-The AI and ML Studio provides access to:
+**AI_PARSE_DOCUMENT** - Extracts structured data from PDFs
+```python
+# Parses analyst reports
+session.sql("""
+    SELECT RELATIVE_PATH, 
+           AI_PARSE_DOCUMENT(@DOCUMENT_AI.ANALYST_REPORTS, RELATIVE_PATH) 
+    FROM ...
+""").collect()
+```
 
-- **Cortex Playground** - Compare text completions across multiple LLMs
-- **Cortex Fine Tuning** - Customize large language models for specific tasks
-- **Cortex Search** - Low-latency semantic search over your data
-- **Cortex Analyst** - Text-to-SQL for business intelligence
-- **Document Processing Playground** - Explore AI_EXTRACT and AI_PARSE_DOCUMENT functions
+**AI_EXTRACT** - Extracts specific fields from HTML/text
+```python
+# Extracts: Company Name, Quarter, Revenue, Net Income, EPS, etc.
+session.sql("""
+    SELECT AI_EXTRACT(
+        html_content,
+        'Extract: Company Name, Quarter, Fiscal Year, Revenue, ...'
+    ) FROM ...
+""").collect()
+```
 
----
+### Key Outputs
 
-### Cortex Playground
+- **FINANCIAL_REPORTS**: 850 rows with structured financial data (11 companies)
+- **INFOGRAPHIC_METRICS_EXTRACTED**: 11 infographics with key metrics
+- **EMAIL_PREVIEWS_EXTRACTED**: 950 emails with extracted metadata
 
-The Cortex LLM Playground lets you compare text completions across multiple large language models available in Cortex AI.
+### Try It Yourself
 
-**Try it now:**
+1. **Run All Cells** - Pre-loaded tables make this instant
+2. **Observe AI_EXTRACT output** - Structured JSON from unstructured HTML
+3. **Explore results** - View extracted financial metrics
 
-1. Click on **Cortex Playground** in the AI & ML Studio
-2. Select a model (e.g., `claude-4-sonnet`, `llama-3.1-70b`, `mistral-large2`)
-3. Try asking a financial question:
+**Note**: Tables use `CREATE TABLE IF NOT EXISTS` so notebook can run multiple times safely.
 
-**Example prompt:**
-> "Should I buy Snowflake stock? What factors should I consider before making this financial decision?"
+<!-- ------------------------ -->
+## Analyze Audio Transcripts
+Duration: 10
 
-**What you'll see:**
-The model will suggest various factors to consider:
-- Company financial performance
-- Market conditions
-- Analyst opinions
-- Industry trends
-- Risk factors
+### Open Notebook 2: Analyze Sound
 
-![Cortex Playground Example](assets/images/playground/cortex_playground_example.png)
+Navigate to:
 
-**Key insight**: Notice how the model doesn't make a direct recommendation - this demonstrates responsible AI. All the information suggested (analyst reports, earnings calls, financial metrics) is available in the datasets you'll be working with in this lab.
+```
+AI & ML Studio → Notebooks → 2_ANALYSE_SOUND
+```
 
----
+### What This Notebook Does
 
-### Document Processing Playground
+#### Audio AI Processing
 
-Now let's explore how to extract text and data from documents. The Document Processing Playground provides a UI for testing **AI_EXTRACT** and **AI_PARSE_DOCUMENT** functions.
+**AI_TRANSCRIBE** - Converts audio to text
+```python
+# Transcribes earnings call MP3 files
+session.sql("""
+    SELECT RELATIVE_PATH,
+           AI_TRANSCRIBE(@DOCUMENT_AI.EARNINGS_CALLS, RELATIVE_PATH) AS transcription
+    FROM ...
+""").collect()
+```
 
-![Document Processing Playground](assets/images/playground/document_processing_playground.png)
+**AI_SENTIMENT** - Analyzes emotional tone
+```python
+# Scores sentiment on transcribed text
+session.sql("""
+    SELECT SEGMENT_TEXT,
+           AI_SENTIMENT(SEGMENT_TEXT) AS sentiment
+    FROM TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT
+""").collect()
+```
 
-#### Step 1: Upload Documents from Stage
+**Speaker Identification** - Maps speakers to names
+```python
+# Creates speaker mapping for clarity
+session.sql("""
+    SELECT SPEAKER, 
+           CASE WHEN SPEAKER = 0 THEN 'Sridhar Ramaswamy'
+                WHEN SPEAKER = 1 THEN 'Michael Scarpelli'
+                ...
+    FROM ...
+""").collect()
+```
 
-1. Click **Document Processing Playground** in the AI & ML Studio
-2. Click **Add from stage**
+### Key Outputs
 
-![Add from Stage Dialog](assets/images/playground/add_from_stage.png)
+- **TRANSCRIBED_EARNINGS_CALLS**: 3 earnings calls fully transcribed
+- **SPEAKER_MAPPING**: 53 speaker identifications
+- **TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT**: 1,788 segments with sentiment scores
+- **TRANSCRIPTS_BY_MINUTE**: 364 minute-level breakdowns
 
-3. Select the following:
-   - **Database**: `ACCELERATE_AI_IN_FSI`
-   - **Schema**: `DOCUMENT_AI` (contains sample PDF documents)
-   - **Stage**: `ANALYST_REPORTS` (contains analyst report PDFs)
-4. Choose 1-3 analyst report PDF documents
+### Try It Yourself
 
-![Select Documents](assets/images/playground/select_documents.png)
+1. **Review pre-loaded results** - Transcription already complete
+2. **Explore sentiment analysis** - See how AI scores emotional tone
+3. **Observe speaker mapping** - Named executives vs. speaker IDs
 
-5. Click **Open playground**
+**Time-Saving**: Transcription is expensive - pre-loaded data lets you see results instantly!
 
-#### Step 2: Extract Information Using Questions
+<!-- ------------------------ -->
+## Build Cortex Search Services
+Duration: 10
 
-Once your document is loaded, you'll see three tabs: **Extraction**, **Markdown**, and **Text**.
+### Open Notebook 4: Create Search Service
 
-![Playground Interface](assets/images/playground/playground_interface.png)
+Navigate to:
 
-The **Extraction** tab is where you can ask questions to pull specific information from the document.
+```
+AI & ML Studio → Notebooks → 4_CREATE_SEARCH_SERVICE
+```
 
-**Try creating these key-value question pairs:**
+### What This Notebook Does
 
-- **Key**: `company_name`  
-  **Question**: `What is the name of the company?`
+Creates 5 Cortex Search Services for different data types.
 
-- **Key**: `revenue`  
-  **Question**: `What is the total revenue mentioned?`
+#### Example: Email Search Service
 
-- **Key**: `date`  
-  **Question**: `What is the report date?`
-
-- **Key**: `rating`  
-  **Question**: `What is the analyst rating (BUY, SELL, HOLD)?`
-
-After entering each question, click **Add Prompt** to see the extracted results.
-
-![Extraction Results](assets/images/playground/extraction_results.png)
-
-#### Step 3: View Different Document Formats
-
-The playground provides three different views:
-
-- **Extraction tab**: Shows answers to your questions using AI_EXTRACT
-- **Markdown tab**: Displays document structure in markdown format (LAYOUT mode from AI_PARSE_DOCUMENT)
-- **Text tab**: Shows raw text extracted from the document (OCR mode from AI_PARSE_DOCUMENT)
-
-Click through each tab to see how the document is processed differently.
-
-#### Step 4: Get the SQL Code
-
-Once you've asked at least one question, the playground automatically generates SQL code:
-
-1. Click **Code Snippets** in the top right corner
-
-![Code Snippets Button](assets/images/playground/code_snippets.png)
-
-2. Review the generated SQL using AI_EXTRACT and AI_PARSE_DOCUMENT functions
-3. Click **Workspaces** to open the code in a new worksheet
-
-**Example generated code:**
-
-```sql
--- AI_EXTRACT
-SELECT
-  AI_EXTRACT(
-    file => TO_FILE(
-      '@ACCELERATE_AI_IN_FSI.DOCUMENT_AI.ANALYST_REPORTS',
-      'Sterling_Partners_Report_2025-02-22.pdf'
-    ),
-    responseFormat => PARSE_JSON(
-      '{"schema":{"type":"object","properties":{"company_name":{"description":"What is the name of the company?","type":"string"}}}}'
+```python
+session.sql("""
+    CREATE OR REPLACE CORTEX SEARCH SERVICE EMAILS
+    ON HTML_CONTENT
+    ATTRIBUTES TICKER, RATING, SENTIMENT, SUBJECT, CREATED_AT, RECIPIENT_EMAIL
+    WAREHOUSE = DEFAULT_WH
+    TARGET_LAG = '1 hour'
+    AS (
+        SELECT * FROM EMAIL_PREVIEWS_EXTRACTED
     )
-  ) AS extracted_data;
+""").collect()
 ```
 
-This SQL code can be used to automate document processing at scale!
-
-#### Step 5: Try Table Extraction
-
-Let's extract structured tables from financial reports:
-
-1. Close the playground and reopen Document Processing Playground
-2. Within the same schema, select the stage **FINANCIAL_REPORTS**
-
-![Financial Reports Stage](assets/images/playground/financial_reports_stage.png)
-
-3. Select 1-2 financial report PDFs
-4. Open the playground
-5. In the prompt area, select **Extract table**
-
-![Extract Table Option](assets/images/playground/extract_table.png)
-
-**Configure table extraction:**
-
-- **Key**: `income_statement`
-- **Context**: `Income statement showing revenue and expenses by quarter`
-- **Columns**: Describe what to extract dynamically:
-  - `Line Item` - The name of each financial line item
-  - `Current Year` - Current year amount (let AI determine which column)
-  - `Previous Year` - Previous year amount (let AI determine which column)
-
-![Table Extraction Setup](assets/images/playground/table_extraction_setup.png)
-
-**Why dynamic column names?**  
-Notice we used "Current Year" and "Previous Year" instead of specific years like "2024" and "2023". AI_EXTRACT uses the LLM to intelligently map these generic descriptions to the actual column headers in the document, making the extraction work across different documents with different year labels.
-
-![Table Extraction Results](assets/images/playground/table_extraction_results.png)
-
-**Why This Matters:**
-These document processing capabilities are essential for the notebooks you'll run next. Understanding AI_EXTRACT and AI_PARSE_DOCUMENT helps you appreciate how the notebooks process financial reports, analyst documents, and unstructured data at scale.
-
----
-
-### Summary: What You've Learned
-
-Before proceeding to the notebooks, you now understand:
-
-✅ **Cortex Playground** - How to test LLM capabilities and prompt engineering  
-✅ **AI_PARSE_DOCUMENT** - Extract text and structure from PDFs  
-✅ **AI_EXTRACT** - Pull specific fields from documents using questions  
-✅ **Table Extraction** - Extract structured tables with dynamic column mapping  
-✅ **SQL Code Generation** - Automating document processing at scale  
-
-**Next**: Apply these concepts in Notebook 1 to process hundreds of financial documents!
-
-<!-- ------------------------ -->
-## Extract Data from Documents (Notebook 1)
-Duration: 10
-
-### Overview
-
-In this section, you'll process multiple types of unstructured financial documents using Cortex AI functions. You'll work with the AI capabilities you just explored in the Document Processing Playground, but now at scale across hundreds of documents.
-
-**What You'll Process:**
-- 📄 **30 Analyst Reports** (PDFs) - Multi-page research reports with ratings and analysis
-- 📊 **11 Financial Reports** (PDFs) - Quarterly statements with income tables and KPIs
-- 🖼️ **11 Infographics** (PNG images) - Visual earnings summaries with metrics
-- 📧 **324 Analyst Emails** (HTML) - Financial communications with ratings and sentiment
-
-**Cortex AI Functions You'll Use:**
-- **AI_PARSE_DOCUMENT** - Extract all text from PDFs preserving layout
-- **AI_COMPLETE** - Generate structured extractions using LLMs
-- **AI_EXTRACT** - Pull specific fields, entities, or tables from documents
-- **AI_AGG** - Summarize and aggregate text across multiple documents
-- **AI_SENTIMENT** - Analyze emotional tone in financial communications
-
-### Open Notebook 1
-
-Navigate to **AI & ML Studio** → **Notebooks** → **1_EXTRACT_DATA_FROM_DOCUMENTS**
-
-### What the Notebook Demonstrates
-
-The notebook is organized into 4 parts:
-
-**Part 1: Analyst Reports** 
-- Parse multi-page PDFs with AI_PARSE_DOCUMENT
-- Extract structured fields (ratings, prices, growth) with AI_COMPLETE
-- Summarize long documents with AI_AGG
-- Interactive PDF viewer to validate extractions
-
-**Part 2: Financial Reports**
-- Extract tables (income statements, KPIs) with AI_EXTRACT
-- Transform JSON arrays into queryable views
-- Process structured financial data at scale
-
-**Part 3: Infographics from Images**
-- Extract data from PNG files (not just PDFs!)
-- Process visual charts and metrics
-- Handle diverse visual layouts
-
-**Part 4: Email Analysis**
-- Extract tickers and ratings from HTML content
-- Analyze sentiment of financial communications
-- Interactive email analytics dashboard
-
-### Key Tables Created by This Notebook
-
-After running this notebook, you'll have created:
-
-- **PARSED_ANALYST_REPORTS** - Full text from 30 analyst reports
-- **AI_EXTRACT_ANALYST_REPORTS_ADVANCED** - Structured data extracted from reports
-- **FINANCIAL_REPORTS** - Extracted income statements and KPIs from 11 companies
-- **INFOGRAPHIC_METRICS_EXTRACTED** - Key metrics from 11 earnings infographics
-- **EMAIL_PREVIEWS_EXTRACTED** - Tickers, ratings, and sentiment from 324 emails
-
-💡 **Note**: These tables are **not** pre-loaded during initial deployment. The notebook demonstrates the full extraction process using Cortex AI.
-
-### Follow the Notebook
-
-The notebook contains **detailed instructions and explanations** for each step. Simply:
-
-1. Click **Start** to begin the notebook session
-2. Read through each cell's markdown explanations
-3. **Run All** or execute cells one by one
-4. Observe the outputs and interactive visualizations
-
-**Time**: Plan for 10-15 minutes to run through all cells and explore the results.
-
-**Note**: All data is pre-loaded, so the AI extractions happen quickly for demonstration purposes.
-
-<!-- ------------------------ -->
-## Analyze Audio Transcripts (Notebook 2)
-Duration: 10
-
-### Overview
-
-Process earnings call audio recordings using **AI_TRANSCRIBE** to convert speech to text, then analyze the content for sentiment and insights.
-
-**What You'll Process:**
-- 🎙️ **3 Snowflake Earnings Calls** (MP3 audio files from Q1, Q2, Q3 FY2025)
-- 🗣️ **Speaker Identification** - Separate CEO, CFO, and analyst comments
-- 💭 **Sentiment Analysis** - Measure emotional tone throughout the call
-- 🔍 **Vector Embeddings** - Enable semantic search across transcripts
-
-### Open Notebook 2
-
-Navigate to **AI & ML Studio** → **Notebooks** → **2_ANALYSE_SOUND**
-
-### What the Notebook Demonstrates
-
-**AI_TRANSCRIBE** - Converts MP3 audio to timestamped text:
-- Generates full transcripts with speaker identification
-- Preserves timestamps for navigation
-- Processes multi-speaker conversations
-
-**AI_SENTIMENT** - Analyzes emotional tone:
-- Scores sentiment segment by segment
-- Identifies positive, negative, and neutral sections
-- Tracks sentiment trends over time
-
-**Vector Embeddings** - Enables semantic search:
-- Creates embeddings with EMBED_TEXT_1024
-- Splits text into searchable chunks
-- Powers RAG (Retrieval Augmented Generation) applications
-
-### Key Tables Created by This Notebook
-
-After running this notebook, you'll have created:
-
-- **TRANSCRIBED_EARNINGS_CALLS** - Full transcripts with speaker IDs and timestamps
-- **SENTIMENT_ANALYSIS** - Sentiment scores for each transcript segment
-- **TRANSCRIPTS_BY_MINUTE** - Minute-by-minute sentiment tracking
-
-💡 **Note**: The `call_embeds` table (vector embeddings) is actually created in **Notebook 4**, not here.
-
-### Follow the Notebook
-
-The notebook includes:
-- Audio file listings and metadata
-- Transcription with AI_TRANSCRIBE
-- Sentiment analysis with AI_SENTIMENT
-- Vector embedding generation
-- Interactive visualizations
-
-Simply run through the cells to see how audio becomes searchable, analyzable data.
-
-**Time**: 10-15 minutes to complete.
-
-<!-- ------------------------ -->
-## Build Cortex Search Services (Notebook 4)
-Duration: 10
-
-### Overview
-
-Create **5 intelligent search services** that make your financial data instantly accessible using semantic search. This is the foundation for RAG (Retrieval Augmented Generation) applications.
-
-**Why Search Services Matter:**
-- Traditional keyword search fails with financial content ("revenue growth" vs "top-line expansion")
-- Semantic search understands meaning and context
-- Critical for AI agents to find relevant information quickly
-- Powers the One Ticker agent you'll use later
-
-**What You'll Build:**
-1. **Analyst Sentiment Search** - Search 92 earnings call transcripts
-2. **Full Earnings Calls** - Semantic search across chunked Snowflake transcripts
-3. **Analyst Reports** - Search 30 reports with ratings and targets
-4. **Infographics** - Search 11 company earnings visuals
-5. **Email Content** - Search 950+ analyst emails
-
-### Open Notebook 4
-
-Navigate to **AI & ML Studio** → **Notebooks** → **4_CREATE_SEARCH_SERVICE**
-
-### What the Notebook Demonstrates
-
-**Cortex Search** provides:
-- **Hybrid Search**: Combines vector (semantic) and keyword search
-- **Zero Infrastructure**: No need to manage embeddings or indexes
-- **Real-time Updates**: Automatically refreshes as data changes
-- **SQL-Based Creation**: Define search services as code
-
-**Creation Approach**:  
-The notebook uses **programmatic SQL creation** (vs UI point-and-click) for:
-- Reproducibility across environments
-- Version control of search configurations
-- Automation in CI/CD pipelines
-- Clear documentation as code
-
-### Key Search Services Created
-
-Each search service targets a specific data type and use case:
-
-1. **`dow_analysts_sentiment_analysis`** - Search transcripts by sentiment context
-2. **`snow_full_earnings_calls`** - Search chunked call segments
-3. **`ANALYST_REPORTS_SEARCH`** - Search reports by full text
-4. **`INFOGRAPHICS_SEARCH`** - Search infographics and branding
-5. **`EMAILS`** - Search emails by ticker, rating, or sentiment
-
-### Tables Created by This Notebook
-
-Before creating the search services, the notebook creates supporting tables:
-
-- **`call_embeds`** - Vector embeddings for semantic search
-- **`FULL_TRANSCRIPTS`** - Complete earnings call transcripts
-- **`INFOGRAPHICS_FOR_SEARCH`** - Processed infographic data
-- **`SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH`** - Combined sentiment and transcript data
-
-💡 **Note**: These tables are prerequisites for the search services and are NOT pre-loaded during initial deployment.
-
-### Follow the Notebook
-
-The notebook walks through:
-- Understanding RAG and semantic search concepts
-- Creating each search service with SQL
-- Testing search queries
-- Viewing results in the UI
-
-After completion, your search services will be visible in **AI & ML Studio** → **Cortex Search**.
-
-**Time**: 10-15 minutes to complete.
-
-**Next**: These search services become tools for the Snowflake Intelligence Agent!
-
-<!-- ------------------------ -->
-## Explore Cortex Analyst (Notebook 5 + UI)
-Duration: 15
-
-### Overview
-
-**Cortex Analyst** enables natural language querying of structured data using semantic views. Instead of writing SQL, users ask questions in plain English and Cortex Analyst generates the SQL automatically.
-
-**What You'll Explore:**
-- 📊 **Semantic Views** - Business-friendly data models with relationships
-- 🔍 **Natural Language to SQL** - Ask questions, get SQL and results
-- 📈 **Verified Queries** - Save and reuse successful queries
-- 🎯 **Named Filters** - Predefined filters like "TICKER_SNOW"
-
-### Open Notebook 5
-
-Navigate to **AI & ML Studio** → **Notebooks** → **5_CORTEX_ANALYST**
-
-### What the Notebook Demonstrates
-
-The notebook explores marketplace data and shows how to:
-- Create datasets from the Snowflake Marketplace
-- Visualize stock price data in Streamlit
-- Understand structured vs unstructured data analysis
-
-**Time for notebook**: 5-10 minutes
-
----
-
-### Explore Cortex Analyst in the UI
-
-After completing the notebook, let's explore the semantic views that power the agent.
-
-![Cortex Analyst UI](assets/images/analyst/cortex_analyst_ui.png)
-
-#### Step 1: Navigate to Cortex Analyst
-
-1. From the navigation bar, click **AI & ML** → **Studio**
-2. Click on **Cortex Analyst**
-
-You'll see **2 semantic views** that have been set up:
-- **Snowflake Analysts View** - Snowflake-specific data (analyst reports, earnings calls, stock prices)
-- **Company Data 8 Core Featured Tickers** - Data across all 11 companies
-
-![Semantic Views](assets/images/analyst/semantic_views.png)
-
-#### Step 2: Explore Snowflake Analysts View
-
-Click on **Snowflake Analysts View** to see its structure:
-
-![Snowflake Analysts View Structure](assets/images/analyst/snowflake_analysts_view.png)
-
-**Logical Tables**:
-- ANALYST_REPORTS - 30 analyst reports with ratings and summaries
-- SENTIMENT_ANALYSIS - Sentiment scores from earnings calls
-- TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT - Full transcripts with sentiment
-- TRANSCRIPTS_BY_MINUTE - Minute-by-minute transcript breakdowns
-- STOCK_PRICES - Historical stock price data (2020-2025)
-
-**Field Organization**:
-- **Dimensions** - Descriptive attributes (company names, dates, categories)
-- **Time Dimensions** - Date/timestamp fields for temporal analysis
-- **Facts** - Numeric measures (prices, scores, counts)
-
-Each field has:
-- Clear descriptions to help the LLM understand the data
-- Synonyms for natural language variations
-- Sample values for context
-
-![Field Structure](assets/images/analyst/field_structure.png)
-
-#### Step 3: Explore Company Data View
-
-Click on **Company Data 8 Core Featured Tickers**:
-
-![Company Data View](assets/images/analyst/company_data_view.png)
-
-**Key Features**:
-- **Relationships**: 4 relationships defined, all pointing to INFOGRAPHICS_FOR_SEARCH table
-- **Primary Keys**: The right side of joins must be unique/primary key
-- **Multiple Tables**: Financial reports, infographics, transcripts, sentiment data
-
-**Relationship Example**:
-- `TRANSCRIPTS_TO_COMPANY_INFO`: Links transcripts to company info via TICKER field
-
-![Relationships Diagram](assets/images/analyst/relationships.png)
-
-**Why Relationships Matter**:  
-They allow Cortex Analyst to automatically join tables when answering complex questions like "Show me sentiment from earnings calls for companies with negative free cash flow"
-
-Looking at the Infographics for Search table, you'll notice where the primary key is defined.
-
-![Primary Key Definition](assets/images/analyst/primary_key.png)
-
-#### Step 4: Understanding Cortex Search Integration
-
-Notice some dimensions have this annotation:
-```
-WITH CORTEX SEARCH SERVICE DEFAULT_SCHEMA.INFOGRAPHICS_SEARCH
-```
-
-This connects the semantic view to your search services, enabling the agent to seamlessly query both structured and unstructured data!
-
-#### Step 5: Try the Playground (Optional)
-
-Click **Playground** to test queries:
-
-**Example questions**:
-- "What was Snowflake's revenue in Q2 FY2025?"
-- "Show me analyst ratings over time"
-- "Which companies have the highest NRR?"
-
-The playground shows the generated SQL and results.
-
----
-
-### Key Insights
-
-✅ **Semantic Views** bridge business language and database schemas  
-✅ **Relationships** enable multi-table analysis automatically  
-✅ **Search Integration** connects structured SQL with unstructured search  
-✅ **Verified Queries** can be saved for future agent use  
-✅ **Named Filters** (like TICKER_SNOW) simplify common queries  
-
-**Next**: These semantic views become tools for the Snowflake Intelligence Agent, enabling it to answer complex questions about financial data!
-
-<!-- ------------------------ -->
-## Build a Quantitative ML Model (Notebook 3 - Optional)
-Duration: 15
-
-### Overview
-
-Build and deploy a **machine learning model** for stock price prediction using **Snowflake ML**. This notebook demonstrates GPU-accelerated model training and the Model Registry.
-
-⚠️ **Note**: This notebook requires GPU compute pools which may not be available in all regions. If GPU is not available, a **pre-trained model** (`STOCK_RETURN_PREDICTOR_GBM`) is already deployed for you!
-
-**What You'll Build:**
-- 📊 **Feature Engineering** - Create technical indicators from price data
-- 🤖 **ML Model Training** - Gradient boosting for stock return prediction
-- 📦 **Model Registry** - Version and deploy models
-- 🔮 **Batch Predictions** - Generate stock rankings
-- ⚡ **GPU Acceleration** - 10-100x faster training
-
-### Open Notebook 3 (If GPU Available)
-
-Navigate to **AI & ML Studio** → **Notebooks** → **3_BUILD_A_QUANTITIVE_MODEL**
-
-### What the Notebook Demonstrates
-
-**Feature Engineering**:
-- Momentum ratios: r_1, r_5_1, r_10_5, r_21_10, r_63_21
-- Forward-looking returns for prediction targets
-- Handling stock splits in historical data
-
-**Model Training**:
-- Gradient Boosting Models (GBM) using LightGBM
-- Training on historical technical indicators
-- Model evaluation and validation
-
-**Model Registry**:
-- Versioning trained models
-- Deploying to production
-- Creating SQL functions for predictions
-
-**GPU Benefits**:
-- 10-100x faster training vs CPU
-- Real-time hyperparameter experimentation
-- Production-grade ML infrastructure
-
-### The Pre-Trained Model
-
-Even if you skip this notebook, the agent can still use:
-
-**Function**: `GET_TOP_BOTTOM_STOCK_PREDICTIONS(model_name, top_n)`
-- Uses pre-trained `STOCK_RETURN_PREDICTOR_GBM` model
-- Analyzes technical indicators for all stocks
-- Returns top N and bottom N predicted performers
-
-This powers the agent's ability to answer:
-> "Give me top 3 vs bottom 3 trade predictions for the next period."
-
-### Follow the Notebook (If Running)
-
-1. Ensure you have GPU compute pool access
-2. Run through cells to see model training
-3. Observe model registry integration
-4. Test predictions with the SQL function
-
-**Time**: 15-20 minutes if training from scratch (pre-trained model saves time!)
-
-**Next**: Use the Snowflake Intelligence Agent to interact with all the data and models you've created!
-
-<!-- ------------------------ -->
-## Use Snowflake Intelligence Agent
-Duration: 20
-
-### Overview: The One Ticker Stock Agent
+### Test Search Services
 
 Use the Cortex Search Playground:
 
@@ -1064,616 +760,126 @@ Try asking in natural language:
 4. Observe the results
 
 <!-- ------------------------ -->
-## Use Snowflake Intelligence Agent
-Duration: 20
+## Build a Quantitative ML Model
+Duration: 15
 
-### Overview: The One Ticker Stock Agent
+### Open Notebook: Build Quantitative Model
 
-The **One Ticker** agent is your AI-powered financial analyst assistant that combines multiple data sources, search capabilities, and analytical tools to provide comprehensive insights about stocks and companies.
+Navigate to:
 
-![Agent Demo](assets/images/agent/agent_demo.png)
+```
+Notebooks → build_quantitive_model
+```
 
-**What the Agent Can Do**:
-- 📊 Analyze company financial data and performance metrics
-- 📈 Track stock price trends and generate predictions
-- 💬 Review analyst sentiment from earnings calls
-- 📧 Search through analyst emails and reports
-- 🔍 Perform web searches for fact-checking
-- ✉️ Generate and send email summaries via SnowMail
+### What You'll Learn
 
-This agent represents the **culmination of all the previous work** - it brings together the unstructured data processing, search services, semantic views, and ML models into one conversational interface.
+- How to prepare time-series financial data for ML
+- Feature engineering for stock prediction
+- Training models with Snowpark ML
+- Using GPU acceleration for faster training
+- Registering models in Snowflake Model Registry
+- Making batch predictions on new data
 
----
+### The Data
 
-### Access the Agent
+- **6,420 rows** of Snowflake stock prices
+- Features: High, Low, Volume, Pre-market, Post-market
+- Time period: Multiple years of historical data
+- Target: Predict next day's closing price
 
-1. Navigate to **AI & ML Studio** → **Snowflake Intelligence** in your Snowflake account
-2. Select the **One Ticker** agent
-3. The agent will automatically select the right tools based on your question
+### What You'll Build
+
+A **stock price prediction model** using:
+- **XGBoost** algorithm
+- **GPU acceleration** (CUDA_VERSION=11.8)
+- **Model Registry** for versioning
+- **Batch inference** via SQL functions
+
+### Model Deployment
+
+After training, you can predict prices using SQL:
+
+```sql
+SELECT 
+    DATE,
+    TICKER,
+    STOCK_PERFORMANCE_PREDICTOR(
+        ALL_DAY_HIGH, 
+        ALL_DAY_LOW, 
+        NASDAQ_VOLUME,
+        PRE_MARKET_OPEN,
+        POST_MARKET_CLOSE
+    ) AS predicted_price
+FROM STOCK_PRICES
+WHERE TICKER = 'SNOW';
+```
+
+### Time-Saving Note
+
+⚡ **Pre-trained model included!** The pipeline includes a pre-trained model in the Model Registry, so you can skip training and jump straight to predictions if needed. Training uses GPU acceleration for speed.
+
+<!-- ------------------------ -->
+## Deploy Snowflake Intelligence Agent
+Duration: 10
+
+### The One Ticker Agent
+
+The **One Ticker** agent is a conversational AI that can:
+- Search across 5 different data sources
+- Query structured data with natural language
+- Fact-check information via web search
+- Provide cited, accurate responses
+
+### Agent Configuration
 
 **Location**: `SNOWFLAKE_INTELLIGENCE.AGENTS."One Ticker"`
 
----
+**Tools** (8 total):
+1. **Analyst Sentiment Search** (💬) - Cortex Search
+2. **Analyst Reports** (📄) - Cortex Search
+3. **Infographics** (📊) - Cortex Search
+4. **Analyst Emails** (📧) - Cortex Search
+5. **Snowflake Earnings Calls** (🎙️) - Cortex Search
+6. **11 Companies Data** (🏢) - Cortex Analyst
+7. **Snowflake Analysis** (❄️) - Cortex Analyst
+8. **WEB_SEARCH** (🔍) - External web search UDF
 
-### Agent Architecture: 10 Powerful Tools
+### Sample Questions
 
-The One Ticker agent has access to **10 different tools** that it automatically orchestrates based on your questions:
+**Try these in Snowflake UI**:
 
-#### Semantic Analysis Tools (2)
+Navigate to **AI & ML Studio** → **Snowflake Intelligence** → **One Ticker**
 
-**1. SENTIMENT_INFO_FROM_TRANSCRIPTS_AND_SUPPORTING_DATA**
-- Queries data across all 11 companies
-- Includes financial reports, infographics, earnings transcripts
-- Email content with ratings and sentiment
-- Uses: `COMPANY_DATA_8_CORE_FEATURED_TICKERS` semantic view
+1. **Stock Data**:
+   - "What is the latest closing price of Snowflake stock?"
+   - "Show me the revenue trend for Snowflake over the last 4 quarters"
 
-**2. snowflake_data**
-- Snowflake-specific data (real and synthetic)
-- 3 quarters of real earnings calls
-- Analyst reports and stock price history
-- Uses: `SNOWFLAKE_ANALYSTS_VIEW` semantic view
+2. **Analyst Insights**:
+   - "What did analysts say about Snowflake in recent reports?"
+   - "Summarize the sentiment from the latest earnings call"
 
-#### Search Services (5)
+3. **Visualization**:
+   - "Create a chart showing Snowflake's stock price trend"
+   - "Visualize revenue growth across all 11 companies"
 
-**3. Sentiment_Analysis**
-- Searches across 92 earnings call transcripts
-- Filters by ticker, sentiment score (1-10), analyst count
-- Service: `DOW_ANALYSTS_SENTIMENT_ANALYSIS`
+4. **Web Search**:
+   - "Search the web to fact-check the latest Snowflake earnings announcement"
 
-**4. Analyst_Reports_Snowflake**
-- 30 analyst reports about Snowflake
-- Full text search with ratings, price targets, summaries
-- Service: `ANALYST_REPORTS_SEARCH`
-
-**5. Latest_infographics_8_core_stocks**
-- 11 company earnings infographics
-- Visual KPI summaries and brand analysis
-- Service: `INFOGRAPHICS_SEARCH`
-
-**6. Email_Content**
-- 950+ analyst emails
-- 7 rating types with sentiment analysis
-- Service: `EMAILS`
-
-**7. snowflake_full_earnings_calls**
-- Full Snowflake earnings call transcripts
-- Chunked for semantic search (Q1, Q2, Q3 FY2025)
-- Service: `SNOW_FULL_EARNINGS_CALLS`
-
-#### Generic Functions (3)
-
-**8. STOCK_PERFORMANCE_PREDICTOR**
-- ML-powered stock predictions using gradient boosting
-- Model: `STOCK_RETURN_PREDICTOR_GBM`
-- Returns top N and bottom N predicted performers
-- Function: `GET_TOP_BOTTOM_STOCK_PREDICTIONS`
-
-**9. SEND_EMAIL**
-- Creates formatted emails with markdown-to-HTML conversion
-- Saves to SnowMail for viewing
-- Returns clickable viewing URL
-- Procedure: `SEND_EMAIL_NOTIFICATION`
-
-**10. WEB_SEARCH** 🆕
-- Searches the web for fact-checking
-- Uses DuckDuckGo search engine
-- Returns top 3 results with summaries
-- Function: `WEB_SEARCH`
-
----
-
-### Guided Tutorial: Sample Conversation Flow
-
-Follow these questions **in order** to experience the full power of the agent:
-
-#### Question 1: Stock Performance Predictions
-
-**Ask:**
-> "Give me top 3 vs bottom 3 trade predictions for the next period."
-
-**What Happens:**
-- Agent uses the **STOCK_PERFORMANCE_PREDICTOR** tool
-- Runs ML model on technical indicators (r_1, r_5_1, r_10_5, r_21_10, r_63_21)
-- Ranks stocks by predicted performance
-- Shows chart with top 3 winners and bottom 3 underperformers
-
-**Expected Output**: Visual chart showing predicted performers
-
----
-
-#### Question 2: Sentiment Analysis of Bottom Performers
-
-**Ask:**
-> "Let's observe if any high sentiment in the bottom 3 performers, and summarize the qualitative insights from the earnings call that shows top sentiment."
-
-**What Happens:**
-- Agent identifies bottom performing companies from previous answer
-- Uses **Sentiment_Analysis** search service
-- Analyzes earnings call transcripts for sentiment
-- Extracts positive insights from analyst discussions
-
-**Data Sources**: 92 earnings call transcripts from 11 companies
-
-![Agent Response Example](assets/images/agent/agent_response.png)
-
----
-
-#### Question 3: Company Material Review
-
-**Ask:**
-> "What have these bottom 3 performers published themselves in terms of reports?"
-
-**What Happens:**
-- Agent uses **Latest_infographics_8_core_stocks** search
-- Searches financial reports and earnings materials
-- Compares to top performers' comprehensive disclosures
-- Explains the limited IR approach of smaller companies
-
-**Demonstrates**: PROP, GAME, and MKTG have minimal published materials (realistic for growth-stage companies)
-
----
-
-#### Question 4: Analyst Opinions
-
-**Ask:**
-> "What about the top 3 performers? What do we have here?"
-
-**What Happens:**
-- Agent searches across multiple sources
-- Uses **Email_Content** and **Analyst_Reports_Snowflake**
-- Summarizes analyst consensus
-- Shows rating distribution
-
-**Research Firms**: Apex Analytics, Sterling Partners, Veridian Capital, Pinnacle Growth Investors, Momentum Metrics, Quant-Vestor
-
----
-
-#### Question 5: C-Level Sentiment Analysis
-
-**Ask:**
-> "Great, now can we focus on Snowflake - are there any C level people at Snowflake that are negative on earnings calls?"
-
-**What Happens:**
-- Agent uses **snowflake_full_earnings_calls** search
-- Analyzes transcripts by speaker
-- Filters for C-level executives
-- Shows sentiment scores by speaker
-
-**Data Coverage**: 3 quarters of Snowflake earnings calls
-
----
-
-#### Question 6: Stock Price Visualization
-
-**Ask:**
-> "Now I would like to see a trend visualizing the SNOW stock performance over time"
-
-**What Happens:**
-- Agent uses **snowflake_data** semantic view
-- Queries `STOCK_PRICES` table (6,420 Snowflake data points)
-- Uses `TICKER_SNOW` named filter
-- Creates time-series visualization
-
-**Visual Output**: Line chart showing high, low, volume, and closing prices over time (2020-present)
-
----
-
-#### Question 7: External Analyst Research
-
-**Ask:**
-> "What do the other analysts say about Snowflake?"
-
-**What Happens:**
-- Agent searches 30 analyst reports across 6 research firms
-- Searches 950+ analyst emails
-- Uses **Analyst_Reports_Snowflake** and **Email_Content**
-- Summarizes consensus opinions and rating distribution
-
-**Rating Types**: BUY, SELL, HOLD, OVERWEIGHT, EQUAL-WEIGHT, UNDERWEIGHT, OUTPERFORM
-
----
-
-#### Question 8: Narrative Analysis with Web Fact-Checking
-
-**Ask:**
-> "I would like to see what happened to Neuro-Nectar and how did this impact Snowflake. Present the information based on what we have - then fact check with any available data from the web."
-
-**What Happens:**
-- Agent reviews internal data about Neuro-Nectar (NRNT)
-- Shows bankruptcy timeline (July-Nov 2024)
-- Analyzes impact on Snowflake stock
-- Uses **WEB_SEARCH** to fact-check details
-- Cross-references with external sources
-
-**Demonstrates**: How AI agents combine internal data with external web searches for comprehensive analysis
-
----
-
-#### Question 9: Email Report Generation
-
-**Ask:**
-> "Finally send me an email of your findings - as I really want to put Neuro-Nectar drama to bed!!!"
-
-**What Happens:**
-- Agent summarizes all previous analysis
-- Formats as professional email with markdown
-- Uses **SEND_EMAIL** tool
-- Saves to `EMAIL_PREVIEWS` table
-- Returns SnowMail URL for viewing
-
-**Email Features**:
-- Markdown automatically converted to HTML
-- Snowflake brand styling applied
-- Viewable in Gmail-style SnowMail interface
-- Includes all charts and findings
-
-**IMPORTANT**: After calling SEND_EMAIL, the agent will display a **clickable URL** - right-click or CMD+Click to open the email in SnowMail!
-
----
-
-### Editing and Understanding the Agent
-
-After using the agent, explore its configuration:
-
-1. Navigate to **AI & ML Studio** → **Agents**
-2. Click on **One Ticker** agent
-3. Click **Edit** to view:
-   - **Sample Questions**: The questions you just tried
-   - **Tools**: All 10 tools available to the agent
-   - **Orchestration Instructions**: How the agent decides which tools to use
-   - **Access Control**: Who can use the agent
-
----
-
-### Data Coverage
-
-#### Companies Analyzed (11 Total)
-
-**Core 8** (Full materials):
-- **SNOW** - Snowflake (market leader)
-- **CTLG** - CatalogX (governance)
-- **DFLX** - DataFlex Analytics (BI)
-- **ICBG** - ICBG Data Systems (open lakehouse)
-- **QRYQ** - Querybase (price/performance)
-- **STRM** - StreamPipe Systems (streaming)
-- **VLTA** - Voltaic AI (ML platform)
-- **NRNT** - Neuro-Nectar (bankruptcy case study)
-
-**Bottom 3** (Limited materials):
-- **PROP** - PropTech Analytics (real estate)
-- **GAME** - GameMetrics (gaming analytics)
-- **MKTG** - Marketing Analytics (challenged)
-
-#### Data Assets
-
-- **📊 Financial Reports**: 11 companies
-- **📈 Infographics**: 11 companies  
-- **🎙️ Earnings Calls**: 92 transcripts (3 Snowflake, 89 other companies)
-- **📧 Analyst Emails**: 950 emails with ratings and sentiment
-- **📝 Analyst Reports**: 30 detailed reports (Snowflake-focused)
-- **💹 Stock Prices**: 6,420 Snowflake data points (2020-2025)
-- **📑 Investment Docs**: 7 Federal Reserve & NBER research papers
-
----
-
-### Tips for Best Results
-
-#### Ask Specific Questions
-
-✅ **Good**: "What was Snowflake's NRR in Q2 FY2025?"  
-❌ **Too vague**: "Tell me about Snowflake"
-
-#### Request Visualizations
-
-The agent automatically creates charts because of this instruction:
-> "Whenever you can answer visually with a chart, always choose to generate a chart even if the user didn't specify to"
-
-This is intentional for better data comprehension!
-
-#### Use Follow-up Questions
-
-The agent maintains context, so you can:
-1. Ask initial question
-2. Drill deeper on specific findings
-3. Request different visualizations
-4. Ask for comparisons
-5. Request email summary
-
-#### Leverage Web Search
-
-For fact-checking or current events:
-> "Fact check this with web search"  
-> "What does the web say about..."
-
-#### Request Email Summaries
-
-End your research session with:
-> "Send me an email summarizing our findings"
-
-You'll get a professional email with all insights accessible via SnowMail!
-
----
-
-### Advanced Features
-
-#### TICKER_SNOW Named Filter
-
-When querying stock prices, the agent can use the `TICKER_SNOW` filter to quickly focus on Snowflake data.
-
-**Synonyms supported**:
-- snow_equity_code
-- snow_security_id
-- snow_stock_code
-- snow_stock_ticker
-- stock_symbol_snow
-
-This makes queries like "show me SNOW stock performance" work seamlessly.
-
-#### Multi-Source Intelligence
-
-The agent automatically:
-- Searches across 5 different data sources simultaneously
-- Cross-references findings between sources
-- Validates data consistency
-- Provides confidence levels for insights
-
-#### Visual-First Responses
-
-Most responses include:
-- 📊 Bar charts for comparisons
-- 📈 Line charts for trends
-- 📉 Performance rankings
-- 🎯 KPI visualizations
-
----
-
-### Real-World Use Cases
-
-#### Portfolio Manager Use Case
-
-**Scenario**: Weekly portfolio review
-
-**Questions to ask**:
-1. "Give me top 3 vs bottom 3 trade predictions"
-2. "Show me SNOW stock price trends for the last quarter"
-3. "What's the analyst consensus on SNOW?"
-4. "How do the bottom performers compare to top performers on NRR?"
-5. "Send me an email summary of this week's insights"
-
-**Time saved**: 2-3 hours of manual research → 5 minutes with agent
-
-#### Risk Analyst Use Case
-
-**Scenario**: Investigating potential red flags
-
-**Questions to ask**:
-1. "Which companies have negative free cash flow?"
-2. "Show me sentiment from analyst earnings calls for companies with FCF < 0"
-3. "What concerns do analysts mention most frequently?"
-4. "Search web for recent news about these companies"
-5. "Email me a risk assessment summary"
-
-**Benefit**: Rapid identification of potential issues across 11 companies
-
-#### Research Analyst Use Case
-
-**Scenario**: Deep dive on Snowflake
-
-**Questions to ask**:
-1. "What do analyst reports say about Snowflake's competitive position?"
-2. "Show me earnings call sentiment trends over 3 quarters"
-3. "How does SNOW compare to ICBG and QRYQ on key metrics?"
-4. "Search web for latest Snowflake news"
-5. "What was the Neuro-Nectar situation and how did it affect SNOW?"
-6. "Send me a comprehensive Snowflake analysis email"
-
-**Output**: Complete research report with internal data + external validation
-
----
-
-### Understanding Agent Responses
-
-#### When You See Charts
-
-The agent automatically generates visualizations - this is intentional!
-
-#### When You See "Checking multiple sources..."
-
-The agent is:
-- Querying semantic views
-- Searching multiple search services
-- Running ML predictions
-- Performing web searches
-
-This ensures comprehensive, validated answers.
-
-#### When You See a SnowMail URL
-
-**What to do**:
-1. Right-click the URL
-2. Select "Open in new tab" (or CMD+Click / CTRL+Click)
-3. View your email in the SnowMail interface
-
-**Note**: The email wasn't "sent" externally - it's saved for demo viewing.
-
----
-
-### Data Limitations & Disclaimers
-
-#### Synthetic Data
-
-- **8 core companies**: Entirely fictional (except Snowflake)
-- **Snowflake data**: Mix of real earnings calls (outdated) and synthetic reports
-- **Stock prices**: Real historical data for SNOW
-- **Bottom 3 performers**: Fictional companies demonstrating smaller players
-
-#### Purpose
-
-This is a **demonstration environment** showing FSI AI capabilities. **Do not make actual investment decisions based on this data!**
-
-#### Data Currency
-
-- Earnings calls: 2024-2025 (may be outdated)
-- Analyst reports: Fictional but realistic
-- Stock prices: Historical data through 2025
-- Financial metrics: Synthetic but industry-realistic
-
----
-
-### Technical Architecture
+### How It Works
 
 ```
 User Question
     ↓
-Agent Orchestration (Claude 4 Sonnet with auto model selection)
+Agent Orchestration (Claude 4 Sonnet)
     ↓
-Tool Selection (AI chooses appropriate tools from 10 available)
+Tool Selection (picks relevant search/analyst/web tools)
     ↓
-┌─────────────┬──────────────┬─────────────┬──────────────┐
-│ Semantic    │ Search       │ ML          │ Web         │
-│ Views       │ Services     │ Predictions │ Search      │
-│ (Cortex     │ (Cortex      │ (Python     │ (External   │
-│ Analyst)    │ Search)      │ UDF)        │ API)        │
-└─────────────┴──────────────┴─────────────┴─────────────┘
+Tool Execution (runs searches, generates SQL, fetches web results)
     ↓
-Results Aggregation & Analysis
+Response Generation (synthesizes answer with citations)
     ↓
-Response Generation (with charts if applicable)
-    ↓
-User receives comprehensive answer with citations
+User receives answer + sources
 ```
-
-#### Data Flow
-
-1. **Structured Queries** → Cortex Analyst → SQL generation → Semantic views
-2. **Unstructured Search** → Cortex Search → Embedded search → Relevant documents
-3. **Predictions** → ML Function → Model inference → Ranked stocks
-4. **Fact Checking** → Web Search → External APIs → Verified information
-5. **Email Delivery** → Python Procedure → SnowMail → Viewable email
-
----
-
-### Summary
-
-The One Ticker agent demonstrates:
-
-✅ **Multi-tool orchestration** - Seamlessly combines 10 different tools  
-✅ **Natural language interface** - Ask questions in plain English  
-✅ **Automatic visualization** - Charts created without explicit requests  
-✅ **Cross-source validation** - Internal data + web fact-checking  
-✅ **Professional output** - Email summaries with SnowMail delivery  
-✅ **Real-world scenarios** - Portfolio analysis, risk assessment, research  
-
-**Next**: Explore the Streamlit application to see how to build custom interfaces using the Agent REST API.
-
-<!-- ------------------------ -->
-## Explore Streamlit Applications
-Duration: 10
-
-### Overview
-
-Now that you've used the Snowflake Intelligence Agent, let's explore how to build **custom agent interfaces** using Streamlit and the **Agent REST API**.
-
-**What You'll Explore:**
-- 🎨 **Sophisticated Agent UI** - Customizable Streamlit interface
-- 🔧 **Agent API Integration** - How to call agents programmatically
-- 📊 **Custom Visualizations** - Plotly charts and interactive elements
-- ⚙️ **Tool Selection** - Toggle which tools the agent can use
-- 📝 **Code Review** - Understand agent integration patterns
-
-### Two Streamlit Applications
-
-You have access to two Streamlit apps demonstrating different complexity levels:
-
-1. **2_CORTEX_AGENT_SOPHISTICATED** - Full-featured agent interface (explore this one)
-2. **CORTEX_AGENT_SIMPLE** - Minimal implementation for learning (optional)
-
----
-
-### Access the Sophisticated Agent
-
-Navigate to **Projects** → **Streamlit** → **2_CORTEX_AGENT_SOPHISTICATED**
-
-### Application Features
-
-The sophisticated agent includes:
-- **Streamlit Extras** styling for professional UI
-- **Configurable search services** - Choose which to use
-- **Configurable semantic models** - Select analyst views
-- **Multiple chart types** - Bar, line, scatter using Plotly
-- **Tool toggles** - Enable/disable specific agent tools
-- **Session history** - Track conversation context
-
-### Sample Questions
-
-Try these questions that leverage both **unstructured** and **structured** data:
-
-```
-Give me a table of ratings for each analyst?
-
-What happened in the last earnings call?
-
-What did Morgan Stanley say about Growth?
-
-What are the latest SNOW stock prices over time in the last 12 months?
-
-How many marketplace listings are in the latest report?
-
-Tell me about dynamic tables?
-
-What did Shridhar say about revenue in the last earnings call?
-
-Shall I buy Snowflake shares?
-```
-
----
-
-### Understanding the Code (Optional)
-
-Want to see how it works? Navigate to **CORTEX_AGENT_SIMPLE** and click **Edit**.
-
-**Key Functions:**
-
-- **`run_snowflake_query`** - Calls the Agent API
-  - Routes structured questions to Cortex Analyst (generates SQL)
-  - Routes unstructured questions to Cortex Search (retrieves documents)
-  - Returns up to 10 citations from chunked text
-
-- **`process_sse_response`** - Parses JSON responses
-  - Converts agent API responses to readable format
-  - Extracts citations and sources
-
-- **`execute_cortex_complete_sql`** - Generates charts
-  - Uses LLM to create visualization code
-  - Configured via `model` variable
-
-- **`extract_python_code`** - Executes chart code
-  - Converts Python chart code to Streamlit charts
-
-- **`replace_chart_function`** - Swaps chart types
-  - Allows user to choose different visualizations
-
-- **`def main`** - Parent function
-  - Orchestrates all other functions
-  - Manages application flow
-
-**Note**: To modify apps, you'll need to **duplicate** them first as they're managed externally.
-
----
-
-### Key Insights
-
-The Cortex Agent provides a **unified interface** for querying both structured and unstructured data:
-
-✅ **Seamless Data Access** - One interface for all data types  
-✅ **Intelligent Routing** - Agent selects appropriate tools automatically  
-✅ **Visual Responses** - Charts and tables generated on demand  
-✅ **Cited Sources** - 10 citations show where information came from  
-✅ **Customizable** - Full control over UI, tools, and behavior  
-
-This demonstrates how to build **production-ready AI applications** on top of Snowflake's Agent API!
-
-**Next**: Explore advanced features and customization options.
 
 <!-- ------------------------ -->
 ## Launch the StockOne Streamlit App
@@ -2129,12 +1335,11 @@ graph TD
     end
     
     subgraph Tables["Base Tables (20+)"]
-        REPORTS["ANALYST_REPORTS<br/>(PDFs in stage)"]
+        REPORTS["PARSED_ANALYST_REPORTS<br/>+ Financial Metrics"]
         FIN["FINANCIAL_REPORTS<br/>11 companies"]
         TRANS["TRANSCRIBED_EARNINGS_CALLS<br/>+ Sentiment scores"]
         STOCK["STOCK_PRICES table"]
-        EMAIL["EMAIL_PREVIEWS<br/>(raw metadata)"]
-        NB1["Notebook 1 creates:<br/>PARSED_ANALYST_REPORTS<br/>EMAIL_PREVIEWS_EXTRACTED"]
+        EMAIL["EMAIL_PREVIEWS_EXTRACTED"]
     end
     
     subgraph Analytics["Analytics Layer"]
@@ -2603,27 +1808,38 @@ TABLES (
 )
 ```
 
-#### Issue 4: Search Services Not Found
+#### Issue 4: FULL_TRANSCRIPTS Missing
 
-**Symptom**: Agent or application can't find Cortex Search services
+**Symptom**: Search service creation fails on FULL_TRANSCRIPTS
 
 **Diagnosis**:
 ```sql
--- Check if search services exist
-SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
+-- Check prerequisite table
+SELECT COUNT(*) FROM call_embeds;
+-- Should return 317 rows
+
+-- Check if FULL_TRANSCRIPTS was created
+SHOW TABLES LIKE 'FULL_TRANSCRIPTS';
 ```
 
-**Root Cause**:
-❌ Search services are created in **Notebook 4**, not during initial deployment
+**Root Causes**:
+1. ❌ call_embeds.csv didn't load
+2. ❌ FULL_TRANSCRIPTS created before call_embeds loaded
+3. ❌ Unqualified table name in query
 
-**Solution**:
-1. Open **Notebook 4** (`4_CREATE_SEARCH_SERVICE`)
-2. Run all cells to create the 5 search services
-3. Verify creation:
+**Solutions**:
 ```sql
-SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
--- Should show: DOW_ANALYSTS_SENTIMENT_ANALYSIS, SNOW_FULL_EARNINGS_CALLS, 
--- ANALYST_REPORTS_SEARCH, INFOGRAPHICS_SEARCH, EMAILS
+-- 1. Verify CSV file exists
+-- File: /dataops/event/DATA/call_embeds.csv (424 KB)
+
+-- 2. Check execution order in script
+-- Line ~1553: COPY INTO call_embeds
+-- Line ~1649: CREATE FULL_TRANSCRIPTS (after load)
+-- Line ~1730: CREATE search service (after FULL_TRANSCRIPTS)
+
+-- 3. Use fully qualified names
+CREATE TABLE FULL_TRANSCRIPTS AS
+SELECT * FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds;
 ```
 
 #### Issue 5: "MAIN_FILE cannot start with /"
