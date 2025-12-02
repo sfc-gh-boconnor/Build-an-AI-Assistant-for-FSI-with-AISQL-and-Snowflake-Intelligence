@@ -29,9 +29,11 @@ Build a Stock Selection Agent that processes and analyzes data from diverse sour
 
 ### Prerequisites
 
-- Snowflake account (free trial works!)
+- Snowflake account (free trial works for most features)
 - ACCOUNTADMIN role access
 - No downloads or CLI tools needed
+
+> **⚠️ Note for Trial Accounts:** The **Web Search** feature requires External Access Integration, which is not enabled by default on trial accounts. If you need this feature, contact your Snowflake representative to have it enabled. All other features work without this.
 
 ### Step 1: Setup Git Integration
 

@@ -35,12 +35,14 @@ In this quickstart, you'll build a comprehensive AI-powered financial analysis p
 
 ### What You'll Need
 
-- A Snowflake account (free trial works!) with **ACCOUNTADMIN** access
+- A Snowflake account (free trial works for most features) with **ACCOUNTADMIN** access
 - Web browser (Chrome, Firefox, or Safari)
 - Basic knowledge of SQL
 - 15-20 minutes for deployment
 
 **No downloads or CLI tools required!** Deploy directly from GitHub using Snowflake's Git integration.
+
+> **⚠️ Note for Trial Accounts:** The **Web Search** agent tool requires **External Access Integration**, which is not enabled by default on trial accounts. If you need this feature, contact your Snowflake representative to have it enabled. All other features (Document AI, Cortex Search, Cortex Analyst, ML predictions, email notifications) work without this.
 
 ### What You'll Build
 
