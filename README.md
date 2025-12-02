@@ -2,16 +2,16 @@
 
 ## Overview
 
-In this guide, you will learn how to build a production-ready AI assistant for financial services using **Snowflake Cortex AI**, **Snowflake Intelligence**, and **Document AI**. 
+Build a production-ready AI assistant for financial services using **Snowflake Cortex AI**, **Snowflake Intelligence**, and **Document AI**. 
 
-You will be covering:
+**No downloads required!** Deploy directly from GitHub using Snowflake's Git integration.
 
-- **Unstructured Data Processing**: Extract insights from PDFs, images, and audio using Document AI functions (AI_PARSE_DOCUMENT, AI_EXTRACT, AI_TRANSCRIBE)
-- **Structured Data Processing**: Build ML models for stock prediction using Snowflake ML and AI_SQL
-- **Agent Tools**: Create semantic search services (Cortex Search) and natural language query interfaces (Cortex Analyst)
-- **Applications**: Deploy intelligent agents that combine multiple data sources with Snowflake Intelligence and Streamlit
+### What You'll Build
 
-A progressive learning experience from processing individual documents, through building ML models, to creating a sophisticated multi-source AI agent that can answer complex financial questions.
+- **Unstructured Data Processing**: Extract insights from PDFs, images, and audio using Document AI
+- **Structured Data Processing**: Build ML models for stock prediction using Snowflake ML
+- **Agent Tools**: Create semantic search services and natural language query interfaces
+- **Applications**: Deploy intelligent agents with Snowflake Intelligence and Streamlit
 
 ## Use Case
 
@@ -25,42 +25,54 @@ Build a Stock Selection Agent that processes and analyzes data from diverse sour
 - **22 Annual Reports** with comprehensive financial statements
 - **4 Audio Files** transcribed with speaker identification
 
-Build intelligent search services, semantic views, and an AI agent that can answer questions like:
-- "What do analysts say about Snowflake's growth prospects?"
-- "Give me top 3 vs bottom 3 stock predictions"
-- "Show me SNOW stock performance over time"
-- "Fact-check findings with web search and send me an email summary"
-
-## Step-By-Step Guide
-
-For prerequisites, environment setup, step-by-step guide and instructions, please refer to the [QuickStart Guide](quickstart.md).
-
-## Quick Start
+## Quick Start (15-20 minutes)
 
 ### Prerequisites
 
 - Snowflake account (free trial works!)
-- Python 3.8+ installed
-- 15-20 minutes
+- ACCOUNTADMIN role access
+- No downloads or CLI tools needed
 
-### Installation
+### Step 1: Setup Git Integration
 
-```bash
-# 1. Install SnowCLI
-pip install snowflake-cli-labs
+Open a SQL Worksheet in Snowflake and run:
 
-# 2. Download and extract this quickstart package
-# (or clone from GitHub)
+```sql
+USE ROLE ACCOUNTADMIN;
 
-# 3. Configure Snowflake connection
-snow connection add
+-- Create separate database for Git repos (persists across deployments)
+CREATE DATABASE IF NOT EXISTS SNOWFLAKE_QUICKSTART_REPOS;
+CREATE SCHEMA IF NOT EXISTS SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS;
 
-# 4. Deploy by running SQL scripts in order (00 → 08)
-cd assets/sql
-snow sql -f 00_config.sql -c <your_connection>
-snow sql -f 01_configure_account.sql -c <your_connection>
-# ... continue with 02 through 08
-# Note: 05b is OPTIONAL (GPU notebook)
+-- Create API integration for GitHub
+CREATE OR REPLACE API INTEGRATION git_api_integration
+    API_PROVIDER = git_https_api
+    API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-boconnor/')
+    ENABLED = TRUE;
+
+-- Create Git repository
+CREATE OR REPLACE GIT REPOSITORY SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
+    API_INTEGRATION = git_api_integration
+    ORIGIN = 'https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git';
+
+-- Fetch latest code
+ALTER GIT REPOSITORY SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
+```
+
+### Step 2: Deploy (Run Scripts 01-08)
+
+```sql
+-- Run deployment scripts directly from GitHub
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
+-- Optional GPU notebook (skip if GPU unavailable):
+-- EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
 ```
 
 ### What Gets Deployed
@@ -75,143 +87,6 @@ snow sql -f 01_configure_account.sql -c <your_connection>
 ✅ 4 Snowflake Notebooks
 ✅ 132 Document files (PDFs, images, audio)
 ```
-
-**Deployment time**: 15-20 minutes
-
----
-
-## Folder Structure
-
-```
-quickstart/
-├── README.md                   → This file
-├── quickstart.md               → Complete step-by-step guide  
-├── MANIFEST.md                 → Complete file listing
-├── PACKAGE_COMPLETE.md         → Implementation details
-├── LICENSE                     → Apache 2.0 license
-│
-└── assets/
-    ├── data/                   → 22 CSV/Parquet files (~25 MB)
-    ├── documents/              → 132 files (~236 MB)
-    │   ├── analyst_reports/    → 30 PDFs
-    │   ├── annual_reports/     → 22 PDFs  
-    │   ├── audio/              → 4 MP3s
-    │   ├── executive_bios/     → 11 PDFs
-    │   ├── financial_reports/  → 11 PDFs
-    │   ├── infographics/       → 11 PNGs
-    │   ├── investment_research/→ 7 PDFs
-    │   ├── portraits/          → 29 images
-    │   └── social_media_images/→ 7 images
-    ├── semantic_models/        → 2 YAML files
-    ├── Notebooks/              → 4 Snowflake notebooks
-    ├── Streamlit/              → StockOne application
-    ├── native_app_snowmail/    → SnowMail Native App files
-    ├── sql/                    → 9 SQL scripts (run in order 00-08)
-    └── docs/                   → Additional documentation
-```
-
----
-
-## Deployment
-
-### Option 1: Git Integration (Recommended - No Downloads!)
-
-Deploy directly from GitHub within Snowflake UI:
-
-**Step 1**: Setup Git integration (one-time):
-
-```sql
--- Open Snowflake UI → SQL Worksheet
--- Copy/paste and run: assets/sql/00_setup_git_integration.sql
--- (Or see GIT_INTEGRATION_GUIDE.md for manual setup)
-```
-
-**Step 2**: Run deployment scripts from GitHub:
-
-```sql
--- Execute all scripts directly from GitHub
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/02_data_foundation.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/03_deploy_cortex_analyst.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/04_deploy_streamlit.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05_deploy_notebooks.sql;
--- Skip 05b if GPU not available:
--- EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/05b_deploy_gpu_notebook.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/06_deploy_documentai.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
-EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/08_setup_ml_infrastructure.sql;
-```
-
-**Benefits**:
-- ✅ No file downloads needed
-- ✅ Always latest version from GitHub
-- ✅ Browser-only deployment
-- ✅ See full documentation in Git UI
-
-**See**: [quickstart.md](quickstart.md) for complete step-by-step guide including Git integration setup
-
----
-
-### Option 2: Using SnowCLI
-
-```bash
-cd assets/sql
-
-# Run files in order (00 → 08)
-snow sql -f 00_config.sql -c <connection>
-snow sql -f 01_configure_account.sql -c <connection>
-snow sql -f 02_data_foundation.sql -c <connection>
-snow sql -f 03_deploy_cortex_analyst.sql -c <connection>
-snow sql -f 04_deploy_streamlit.sql -c <connection>
-snow sql -f 05_deploy_notebooks.sql -c <connection>
-snow sql -f 05b_deploy_gpu_notebook.sql -c <connection>  # OPTIONAL - Skip if GPU unavailable
-snow sql -f 06_deploy_documentai.sql -c <connection>
-snow sql -f 07_deploy_snowmail.sql -c <connection>
-snow sql -f 08_setup_ml_infrastructure.sql -c <connection>
-```
-
-**Important**: 
-- Run scripts in numerical order (00 through 08)
-- Script **05b** is OPTIONAL - skip if GPU_NV_S not available in your region
-
----
-
-### Option 3: Snowflake UI with Downloaded Files
-
-1. Download/clone this repository
-2. Open Snowflake UI → SQL Worksheet
-3. Copy contents of each SQL file in order (01 → 08, 05b optional)
-4. Run each script and wait for completion
-
-**Deployment time**: 15-20 minutes total
-
----
-
-## What You'll Learn
-
-### Document AI Processing
-- Extract structured data from PDFs with **AI_PARSE_DOCUMENT**
-- Extract fields from images and documents with **AI_EXTRACT**
-- Analyze sentiment with **AI_SENTIMENT**
-- Summarize documents with **AI_AGG**
-- Transcribe audio with **AI_TRANSCRIBE**
-
-### Machine Learning
-- Build time series forecasts with **AI_SQL (AI_FORECAST)**
-- Train gradient boosting models with **Snowflake ML**
-- Deploy models to Model Registry
-- Create SQL functions for predictions
-
-### Search & Semantic Views
-- Create semantic search services with **Cortex Search**
-- Build natural language SQL interfaces with **Cortex Analyst**
-- Configure RAG (Retrieval Augmented Generation)
-
-### Intelligent Agents
-- Deploy multi-tool agents with **Snowflake Intelligence**
-- Integrate search, ML, and web search tools
-- Build conversational interfaces with **Streamlit**
-- Generate automated email summaries
 
 ---
 
@@ -237,102 +112,69 @@ Navigate to: **AI & ML Studio** → **Snowflake Intelligence** → **One Ticker*
 - "Search the web for latest Snowflake news"
 - "Send me an email summary"
 
-### 3. Cortex Search
+### 3. SnowMail
 
-Navigate to: **AI & ML Studio** → **Cortex Search** → Select a service
+Navigate to: **Data Products** → **Apps** → **SNOWMAIL**
 
-**Try searching**:
-- EMAILS: "Tell me about profitable companies"
-- ANALYST_REPORTS_SEARCH: "What are the price targets?"
-- Sentiment_Analysis: "Find negative earnings call sentiment"
+View AI-generated email reports from the agent.
 
 ### 4. Snowflake Notebooks
 
 Navigate to: **AI & ML Studio** → **Notebooks**
 
 **Run**:
-- **1_EXTRACT_DATA_FROM_DOCUMENTS** - See Document AI process 850+ reports
-- **2_ANALYSE_SOUND** - See AI_TRANSCRIBE process earnings calls
-- **3_BUILD_A_QUANTITIVE_MODEL** - Train ML model with GPU
+- **1_EXTRACT_DATA_FROM_DOCUMENTS** - Document AI processing
+- **2_ANALYSE_SOUND** - Audio transcription and analysis
+- **3_BUILD_A_QUANTITIVE_MODEL** - ML model training (GPU)
 - **4_CREATE_SEARCH_SERVICE** - Build Cortex Search services
 
 ---
 
-## Data Overview
+## Folder Structure
 
-### 11 Companies Analyzed
-
-| Ticker | Company | Industry | Status |
-|--------|---------|----------|--------|
-| SNOW | Snowflake | Cloud Data | Market Leader |
-| CTLG | CatalogX | Governance | Profitable |
-| DFLX | DataFlex Analytics | BI | Profitable |
-| ICBG | Iceberg Data Systems | Open Lakehouse | Competitor |
-| QRYQ | Querybase Technologies | Analytics | Growth |
-| STRM | StreamPipe Systems | Streaming | Partner |
-| VLTA | Voltaic AI | ML Platform | AI-Enhanced |
-| NRNT | Neuro-Nectar | Biotech | **COLLAPSED** (Nov 2024) |
-| PROP | PropTech Analytics | Real Estate | Limited Data |
-| GAME | GameMetrics | Gaming | Limited Data |
-| MKTG | Marketing Analytics | Marketing Tech | Limited Data |
-
-**Note**: All data except Snowflake earnings calls is synthetic for educational purposes.
-
-### Data Assets
-
-- **📊 20+ Structured Tables**: 10,000+ rows of financial data
-- **📄 132 Documents**: PDFs, images, audio files
-- **🔍 5 Search Services**: Semantic search across all data types
-- **📈 2 Semantic Views**: Natural language SQL queries
-- **🤖 1 AI Agent**: 8 tools for financial analysis
-- **💻 1 Streamlit App**: Interactive chat interface
-- **📓 4 Notebooks**: Complete analysis workflows
-- **🧠 1 ML Model**: GPU-trained stock predictor
+```
+quickstart/
+├── README.md                   → This file
+├── quickstart.md               → Complete step-by-step guide
+├── FETCH_LATEST_FROM_GIT.sql   → Utility to refresh Git repo
+├── LICENSE                     → Apache 2.0 license
+│
+└── assets/
+    ├── sql/                    → Deployment scripts (01-08)
+    ├── data/                   → CSV/Parquet files
+    ├── documents/              → PDFs, images, audio
+    ├── Notebooks/              → Snowflake notebooks
+    ├── Streamlit/              → StockOne application
+    ├── native_app_snowmail/    → SnowMail Native App
+    ├── semantic_models/        → YAML definitions
+    └── docs/                   → Troubleshooting, deployment notes
+```
 
 ---
 
-## Key Features
+## Re-deploying / Reset
 
-### Multi-Modal AI
-- Process documents, images, audio, and structured data
-- Extract insights from any format
-- Build unified analytics across data types
+Since the Git repo is in a separate database, you can easily reset:
 
-### Conversational Interface
-- Ask questions in plain English
-- Get cited responses with source references
-- Auto-generated visualizations
+```sql
+-- Drop the main database (Git repo stays safe!)
+DROP DATABASE IF EXISTS ACCELERATE_AI_IN_FSI;
 
-### Production-Ready
-- Enterprise-grade security and governance
-- Scalable architecture
-- Deployed in 15-20 minutes
+-- Fetch latest code
+ALTER GIT REPOSITORY SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
+
+-- Re-run deployment scripts (01-08)
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/01_configure_account.sql;
+-- ... etc
+```
 
 ---
 
 ## Documentation
 
 - **[quickstart.md](quickstart.md)** - Complete step-by-step guide
-- **[MANIFEST.md](MANIFEST.md)** - Complete file listing
-- **[PACKAGE_COMPLETE.md](PACKAGE_COMPLETE.md)** - Implementation details
-- **[assets/docs/DEPLOYMENT_NOTES.md](assets/docs/DEPLOYMENT_NOTES.md)** - Configuration guide
 - **[assets/docs/TROUBLESHOOTING.md](assets/docs/TROUBLESHOOTING.md)** - Common issues
-
----
-
-## Support
-
-### Resources
-
-- **Quickstart Guide**: See [quickstart.md](quickstart.md)
-- **Troubleshooting**: See [assets/docs/TROUBLESHOOTING.md](assets/docs/TROUBLESHOOTING.md)
-- **Snowflake Docs**: https://docs.snowflake.com
-
-### Community
-
-- **Snowflake Community**: https://community.snowflake.com
-- **GitHub Issues**: Submit issues to this repository
-- **Snowflake Support**: For account-specific issues
+- **[assets/docs/DEPLOYMENT_NOTES.md](assets/docs/DEPLOYMENT_NOTES.md)** - Configuration guide
 
 ---
 
