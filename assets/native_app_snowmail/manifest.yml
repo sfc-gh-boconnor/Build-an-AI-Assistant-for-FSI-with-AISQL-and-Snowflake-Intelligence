@@ -9,13 +9,6 @@ artifacts:
   setup_script: setup.sql
   default_streamlit: app_schema.email_viewer
 
-references:
-  - consumer_data:
-      label: "FSI Data Access"
-      description: "Access to email previews and analytics data"
-      privileges:
-        - USAGE
-      object_type: DATABASE
-
 configuration:
   log_level: INFO
+  trace_level: OFF

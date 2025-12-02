@@ -98,27 +98,28 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
 -- ========================================
--- Step 5: Bind Database Reference
+-- Step 5: Grant Permissions Required
 -- ========================================
 
--- Native Apps use references to access consumer data
--- Bind the consumer_data reference to the actual database
+-- SnowMail requires permissions to access the EMAIL_PREVIEWS table
+-- These must be granted via the Snowflake UI
 
 USE ROLE ACCOUNTADMIN;
-
--- Bind the database reference declared in manifest.yml
-ALTER APPLICATION SNOWMAIL
-  SET REFERENCE consumer_data = ACCELERATE_AI_IN_FSI;
-
--- ========================================
--- Deployment Complete
--- ========================================
 
 SELECT '✅ SnowMail Native App deployed successfully!' AS STATUS,
        'Application: SNOWMAIL' AS APP_NAME,
        'Package: SNOWMAIL_PKG' AS PACKAGE_NAME,
        'Version: V1_0' AS VERSION,
-       'Reference bound: ACCELERATE_AI_IN_FSI' AS DATABASE_ACCESS;
+       '' AS BLANK_LINE,
+       '⚠️  NEXT STEP: Grant Permissions via UI' AS IMPORTANT,
+       'Navigate to: Apps → SNOWMAIL → Security tab' AS STEP_1,
+       'Click: Grant or Manage Privileges' AS STEP_2,
+       'Grant these permissions:' AS STEP_3,
+       '  • Database ACCELERATE_AI_IN_FSI (USAGE)' AS GRANT_1,
+       '  • Schema DEFAULT_SCHEMA (USAGE)' AS GRANT_2,
+       '  • Table EMAIL_PREVIEWS (SELECT, DELETE)' AS GRANT_3,
+       '  • Warehouse DEFAULT_WH (USAGE)' AS GRANT_4,
+       'Then refresh the app to view emails!' AS FINAL_STEP;
 
 -- ========================================
 -- Deployment Complete
