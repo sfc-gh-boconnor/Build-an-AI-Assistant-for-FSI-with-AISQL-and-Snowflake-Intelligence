@@ -77,6 +77,16 @@ PURGE = TRUE;
 GRANT SELECT, INSERT ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ACCOUNTADMIN;
 GRANT SELECT, INSERT ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE PUBLIC;
 
+-- Grant to SnowMail app if it exists (prevents losing access if script 02 is re-run after script 07)
+-- This will fail silently if the app doesn't exist yet - that's OK, script 07 will grant when app is created
+BEGIN
+    GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
+EXCEPTION
+    WHEN OTHER THEN
+        -- App doesn't exist yet, ignore
+        NULL;
+END;
+
 -- =====================================================
 -- 2. unique_transcripts Table (Raw Transcript Data)
 -- =====================================================

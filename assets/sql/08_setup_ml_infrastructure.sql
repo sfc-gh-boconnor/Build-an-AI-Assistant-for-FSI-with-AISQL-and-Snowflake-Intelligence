@@ -298,14 +298,8 @@ def main(session: snowpark.Session, model_name: str = 'STOCK_RETURN_PREDICTOR_GB
     return get_top_bottom_stock_predictions(session, model_name, top_n)
 $$;
 
--- Create EMAIL_PREVIEWS table for SnowMail integration
-CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
-    EMAIL_ID VARCHAR(100) PRIMARY KEY,
-    RECIPIENT_EMAIL VARCHAR(500),
-    SUBJECT VARCHAR(1000),
-    HTML_CONTENT VARCHAR(16777216),
-    CREATED_AT TIMESTAMP_NTZ
-);
+-- EMAIL_PREVIEWS table is created in script 02_data_foundation.sql
+-- No need to recreate it here
 
 create or replace notification integration email_integration
   type=email
