@@ -395,6 +395,8 @@ Before diving into the notebooks, let's explore the **AI & ML Studio** - your on
 
 Navigate to the **AI & ML** section in the Snowflake navigation bar.
 
+![AI & ML Studio](assets/images/playground/ai_ml_studio.png)
+
 ### Features You'll Explore
 
 The AI and ML Studio provides access to:
@@ -428,6 +430,8 @@ The model will suggest various factors to consider:
 - Industry trends
 - Risk factors
 
+![Cortex Playground Example](assets/images/playground/cortex_playground_example.png)
+
 **Key insight**: Notice how the model doesn't make a direct recommendation - this demonstrates responsible AI. All the information suggested (analyst reports, earnings calls, financial metrics) is available in the datasets you'll be working with in this lab.
 
 ---
@@ -436,20 +440,30 @@ The model will suggest various factors to consider:
 
 Now let's explore how to extract text and data from documents. The Document Processing Playground provides a UI for testing **AI_EXTRACT** and **AI_PARSE_DOCUMENT** functions.
 
+![Document Processing Playground](assets/images/playground/document_processing_playground.png)
+
 #### Step 1: Upload Documents from Stage
 
 1. Click **Document Processing Playground** in the AI & ML Studio
 2. Click **Add from stage**
+
+![Add from Stage Dialog](assets/images/playground/add_from_stage.png)
+
 3. Select the following:
    - **Database**: `ACCELERATE_AI_IN_FSI`
    - **Schema**: `DOCUMENT_AI` (contains sample PDF documents)
    - **Stage**: `ANALYST_REPORTS` (contains analyst report PDFs)
 4. Choose 1-3 analyst report PDF documents
+
+![Select Documents](assets/images/playground/select_documents.png)
+
 5. Click **Open playground**
 
 #### Step 2: Extract Information Using Questions
 
 Once your document is loaded, you'll see three tabs: **Extraction**, **Markdown**, and **Text**.
+
+![Playground Interface](assets/images/playground/playground_interface.png)
 
 The **Extraction** tab is where you can ask questions to pull specific information from the document.
 
@@ -469,6 +483,8 @@ The **Extraction** tab is where you can ask questions to pull specific informati
 
 After entering each question, click **Add Prompt** to see the extracted results.
 
+![Extraction Results](assets/images/playground/extraction_results.png)
+
 #### Step 3: View Different Document Formats
 
 The playground provides three different views:
@@ -484,6 +500,9 @@ Click through each tab to see how the document is processed differently.
 Once you've asked at least one question, the playground automatically generates SQL code:
 
 1. Click **Code Snippets** in the top right corner
+
+![Code Snippets Button](assets/images/playground/code_snippets.png)
+
 2. Review the generated SQL using AI_EXTRACT and AI_PARSE_DOCUMENT functions
 3. Click **Workspaces** to open the code in a new worksheet
 
@@ -511,9 +530,14 @@ Let's extract structured tables from financial reports:
 
 1. Close the playground and reopen Document Processing Playground
 2. Within the same schema, select the stage **FINANCIAL_REPORTS**
+
+![Financial Reports Stage](assets/images/playground/financial_reports_stage.png)
+
 3. Select 1-2 financial report PDFs
 4. Open the playground
 5. In the prompt area, select **Extract table**
+
+![Extract Table Option](assets/images/playground/extract_table.png)
 
 **Configure table extraction:**
 
@@ -524,8 +548,12 @@ Let's extract structured tables from financial reports:
   - `Current Year` - Current year amount (let AI determine which column)
   - `Previous Year` - Previous year amount (let AI determine which column)
 
+![Table Extraction Setup](assets/images/playground/table_extraction_setup.png)
+
 **Why dynamic column names?**  
 Notice we used "Current Year" and "Previous Year" instead of specific years like "2024" and "2023". AI_EXTRACT uses the LLM to intelligently map these generic descriptions to the actual column headers in the document, making the extraction work across different documents with different year labels.
+
+![Table Extraction Results](assets/images/playground/table_extraction_results.png)
 
 **Why This Matters:**
 These document processing capabilities are essential for the notebooks you'll run next. Understanding AI_EXTRACT and AI_PARSE_DOCUMENT helps you appreciate how the notebooks process financial reports, analyst documents, and unstructured data at scale.
@@ -768,6 +796,8 @@ The notebook explores marketplace data and shows how to:
 
 After completing the notebook, let's explore the semantic views that power the agent.
 
+![Cortex Analyst UI](assets/images/analyst/cortex_analyst_ui.png)
+
 #### Step 1: Navigate to Cortex Analyst
 
 1. From the navigation bar, click **AI & ML** → **Studio**
@@ -777,9 +807,13 @@ You'll see **2 semantic views** that have been set up:
 - **Snowflake Analysts View** - Snowflake-specific data (analyst reports, earnings calls, stock prices)
 - **Company Data 8 Core Featured Tickers** - Data across all 11 companies
 
+![Semantic Views](assets/images/analyst/semantic_views.png)
+
 #### Step 2: Explore Snowflake Analysts View
 
 Click on **Snowflake Analysts View** to see its structure:
+
+![Snowflake Analysts View Structure](assets/images/analyst/snowflake_analysts_view.png)
 
 **Logical Tables**:
 - ANALYST_REPORTS - 30 analyst reports with ratings and summaries
@@ -798,9 +832,13 @@ Each field has:
 - Synonyms for natural language variations
 - Sample values for context
 
+![Field Structure](assets/images/analyst/field_structure.png)
+
 #### Step 3: Explore Company Data View
 
 Click on **Company Data 8 Core Featured Tickers**:
+
+![Company Data View](assets/images/analyst/company_data_view.png)
 
 **Key Features**:
 - **Relationships**: 4 relationships defined, all pointing to INFOGRAPHICS_FOR_SEARCH table
@@ -810,8 +848,14 @@ Click on **Company Data 8 Core Featured Tickers**:
 **Relationship Example**:
 - `TRANSCRIPTS_TO_COMPANY_INFO`: Links transcripts to company info via TICKER field
 
+![Relationships Diagram](assets/images/analyst/relationships.png)
+
 **Why Relationships Matter**:  
 They allow Cortex Analyst to automatically join tables when answering complex questions like "Show me sentiment from earnings calls for companies with negative free cash flow"
+
+Looking at the Infographics for Search table, you'll notice where the primary key is defined.
+
+![Primary Key Definition](assets/images/analyst/primary_key.png)
 
 #### Step 4: Understanding Cortex Search Integration
 
@@ -1098,6 +1142,8 @@ Duration: 20
 
 The **One Ticker** agent is your AI-powered financial analyst assistant that combines multiple data sources, search capabilities, and analytical tools to provide comprehensive insights about stocks and companies.
 
+![Agent Demo](assets/images/agent/agent_demo.png)
+
 **What the Agent Can Do**:
 - 📊 Analyze company financial data and performance metrics
 - 📈 Track stock price trends and generate predictions
@@ -1218,6 +1264,8 @@ Follow these questions **in order** to experience the full power of the agent:
 - Extracts positive insights from analyst discussions
 
 **Data Sources**: 92 earnings call transcripts from 11 companies
+
+![Agent Response Example](assets/images/agent/agent_response.png)
 
 ---
 
