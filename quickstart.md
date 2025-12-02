@@ -13,6 +13,56 @@ tags: Cortex AI, Snowflake Intelligence, Document AI, Financial Services, Agents
 ## Overview
 Duration: 5
 
+### Introduction
+
+Effective stock selection relies on having up-to-date data from diverse sources—research analyst reports, 10-K filings, investor call recordings, historical tick data, and real-time market feeds. To manage this efficiently, a unified platform is essential—one capable of storing and processing all data types, whether PDFs of analyst reports, MP3 investor recordings, or SEC documents.
+
+This data must be readily accessible for analysis using the latest large language models (LLMs) such as Anthropic, Gemma, LLaMA, or DeepSeek. Ensuring the trustworthiness and security of generated summaries and insights is critical, especially when they inform high-stakes financial decisions.
+
+In addition, developing Agentic AI capabilities allows for natural language question-answering tailored to investors and traders who need precise, real-time insights before executing trades.
+
+**In this hands-on lab, you'll learn how to build a Stock Selection Agent from the ground up using the Snowflake AI Data Cloud.**
+
+Learn how you can leverage the latest AI technologies right within the Snowflake platform. When AI is deeply embedded in your trusted data platform, the possibilities are endless. We will be exploring the processing of both **Unstructured** and **Structured** data which will then allow the application of a **Cortex Agent** to help discover insights by leveraging **All Data.**
+
+### Data Sources and Analyst Coverage
+
+This hands-on lab utilizes a comprehensive dataset spanning multiple data types and financial analysts to demonstrate real-world AI applications in financial services. You'll work with:
+
+**Analyst Research Reports**
+
+The lab features comprehensive analysis from specialized research firms created specifically for this hands-on experience:
+- **Apex Analytics** - Growth-focused equity research
+- **Consensus Point** - Institutional-grade analysis and recommendations
+- **Momentum Metrics** - Quantitative trading insights and momentum analysis
+- **Pinnacle Growth Investors** - Growth equity research and sector analysis
+- **Quant-Vestor** - Quantitative investment research and algorithmic trading insights
+- **Sterling Partners** - Value-oriented investment analysis
+- **Veridian Capital** - Comprehensive equity research and market analysis
+
+**Multi-Modal Data Integration**
+
+Throughout the lab, you'll process and analyze:
+- **Research Reports** - 30 analyst reports from 6 research firms, extract structured insights (ratings, price targets, growth forecasts) using Document AI
+- **Earnings Call Transcripts** - Process 92 audio recordings from 11 companies into searchable text with sentiment analysis
+- **Financial Infographics** - Extract key metrics from 11 quarterly earnings visuals using multimodal AI
+- **Analyst Emails** - 950+ professional analyst emails with 7 rating types (BUY, OVERWEIGHT, OUTPERFORM, HOLD, EQUAL-WEIGHT, UNDERWEIGHT, SELL)
+- **Investment Research** - 7 Federal Reserve and NBER research papers on portfolio management and risk
+- **Stock Price Data** - Historical data with 6,420+ Snowflake price points (2020-2025)
+- **Financial Reports** - 11 companies with income statements, KPIs, and customer metrics
+
+**AI-Powered Analysis Journey**
+
+Your AI assistant will synthesize insights from all these sources to answer questions like:
+- *"What do Apex Analytics and Consensus Point analysts say about Snowflake's growth prospects?"*
+- *"How does Momentum Metrics' quantitative analysis compare to Sterling Partners' value assessment?"*
+- *"What are Veridian Capital's latest price targets and how do they align with earnings call sentiment?"*
+- *"Based on all available data, should I buy, sell, or hold Snowflake shares?"*
+
+This diverse dataset enables you to experience how modern AI can unify structured financial data with unstructured analyst opinions, creating comprehensive investment intelligence.
+
+> **⚠️ Important Disclaimer:** All analyst reports and company data (except Snowflake) are completely fictitious for educational purposes. Financial decisions cannot be made based on any outcomes of this lab. Snowflake earnings calls are real but may be outdated.
+
 ### What You'll Build
 
 In this quickstart, you'll build a comprehensive AI-powered financial analysis platform called **StockOne** using Snowflake's Cortex AI capabilities. This end-to-end solution demonstrates how to:
