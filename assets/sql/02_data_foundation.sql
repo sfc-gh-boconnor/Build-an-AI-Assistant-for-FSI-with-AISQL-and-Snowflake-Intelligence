@@ -433,20 +433,23 @@ GRANT USAGE ON PROCEDURE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SEND_EMAIL_NOTIFICA
 -- =====================================================
 -- SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH View
 -- =====================================================
--- This view will be populated when Notebook 2 creates the underlying tables
+-- Joins unique_transcripts with sentiment data
 -- =====================================================
 
 CREATE OR REPLACE VIEW ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH AS 
 SELECT 
-    primary_ticker,
-    event_timestamp,
-    event_type,
-    created_at,
-    sentiment_score,
-    unique_analyst_count,
-    sentiment_reason,
-    LENGTH(transcript) AS transcript_length
-FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts;
+    t.primary_ticker,
+    t.event_timestamp,
+    t.event_type,
+    t.created_at,
+    s.sentiment_score,
+    s.unique_analyst_count,
+    s.sentiment_reason,
+    LENGTH(t.transcript) AS transcript_length
+FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts t
+LEFT JOIN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALYSTS_SENTIMENTS s
+    ON t.primary_ticker = s.primary_ticker 
+    AND t.event_timestamp = s.event_timestamp;
 
 GRANT SELECT ON VIEW ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH TO ROLE ACCOUNTADMIN;
 GRANT SELECT ON VIEW ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH TO ROLE PUBLIC;
