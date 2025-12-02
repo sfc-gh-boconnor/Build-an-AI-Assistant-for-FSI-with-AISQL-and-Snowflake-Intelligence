@@ -9,5 +9,16 @@ artifacts:
   setup_script: setup.sql
   default_streamlit: app_schema.email_viewer
 
+references:
+  - EMAIL_PREVIEWS_TABLE:
+      label: "Email Previews Table"
+      description: "Table containing email previews from Snowflake Intelligence agents"
+      privileges:
+        - SELECT
+        - DELETE
+      object_type: TABLE
+      multi_valued: false
+      register_callback: app_schema.register_reference
+
 configuration:
   log_level: INFO
