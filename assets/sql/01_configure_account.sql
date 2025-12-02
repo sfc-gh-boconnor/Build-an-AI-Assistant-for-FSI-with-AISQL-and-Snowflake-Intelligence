@@ -97,6 +97,33 @@ $$Cortex Analyst schema containing:
 • Users can ask questions in plain English$$;
 
 -- =====================================================
+-- External Access Integration for Web Search
+-- =====================================================
+-- Enables the WEB_SEARCH function to access DuckDuckGo
+
+CREATE OR REPLACE NETWORK RULE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SNOWFLAKE_INTELLIGENCE_WEBACCESS_RULE
+  MODE = EGRESS
+  TYPE = HOST_PORT
+  VALUE_LIST = ('0.0.0.0:80', '0.0.0.0:443');
+
+CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
+  ALLOWED_NETWORK_RULES = (ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SNOWFLAKE_INTELLIGENCE_WEBACCESS_RULE)
+  ENABLED = true;
+
+GRANT USAGE ON INTEGRATION SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION TO ROLE PUBLIC;
+
+-- =====================================================
+-- Email Notification Integration
+-- =====================================================
+-- Enables the SEND_EMAIL_NOTIFICATION procedure
+
+CREATE OR REPLACE NOTIFICATION INTEGRATION snowflake_intelligence_email_int
+  TYPE = EMAIL
+  ENABLED = TRUE;
+
+GRANT USAGE ON INTEGRATION snowflake_intelligence_email_int TO ROLE PUBLIC;
+
+-- =====================================================
 -- Configuration Complete!
 -- =====================================================
 
