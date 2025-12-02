@@ -78,6 +78,20 @@ CREATE APPLICATION SNOWMAIL
 -- Step 5: Grant Permissions to SnowMail Application
 -- ========================================
 
+-- Ensure EMAIL_PREVIEWS table exists (should be created in script 02)
+-- If script 02 hasn't been run, create a minimal version for SnowMail to work
+CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
+    EMAIL_ID VARCHAR(100) PRIMARY KEY,
+    RECIPIENT_EMAIL VARCHAR(500),
+    SUBJECT VARCHAR(1000),
+    HTML_CONTENT VARCHAR,
+    CREATED_AT TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    TICKER VARCHAR(50),
+    RATING VARCHAR(50),
+    SENTIMENT VARCHAR(50)
+)
+COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
+
 -- Grant database and schema access
 GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
 GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
