@@ -327,8 +327,8 @@ SHOW TABLES;
 SELECT 'FINANCIAL_REPORTS' AS table_name, COUNT(*) AS rows 
 FROM DOCUMENT_AI.FINANCIAL_REPORTS
 UNION ALL
-SELECT 'EMAIL_PREVIEWS_EXTRACTED', COUNT(*) 
-FROM DEFAULT_SCHEMA.EMAIL_PREVIEWS_EXTRACTED
+SELECT 'EMAIL_PREVIEWS', COUNT(*) 
+FROM DEFAULT_SCHEMA.EMAIL_PREVIEWS
 UNION ALL
 SELECT 'STOCK_PRICES', COUNT(*) 
 FROM DEFAULT_SCHEMA.STOCK_PRICES
@@ -339,22 +339,14 @@ FROM DEFAULT_SCHEMA.TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT;
 
 **Expected Results**:
 - FINANCIAL_REPORTS: **850 rows** (11 companies)
-- EMAIL_PREVIEWS_EXTRACTED: **950 rows** (11 tickers)
 - STOCK_PRICES: **6,420 rows** (Snowflake stock)
 - TRANSCRIBED_EARNINGS_CALLS_WITH_SENTIMENT: **1,788 rows**
+- EMAIL_PREVIEWS: **324 rows** (email metadata)
 
-### Verify Search Services (5)
-
-```sql
-SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
-```
-
-You should see 5 services with **ACTIVE** status:
-- ✅ DOW_ANALYSTS_SENTIMENT_ANALYSIS (92 rows)
-- ✅ SNOW_FULL_EARNINGS_CALLS (317 rows)
-- ✅ ANALYST_REPORTS_SEARCH (30 rows)
-- ✅ INFOGRAPHICS_SEARCH (11 rows)
-- ✅ EMAILS (950 rows)
+⚠️ **Note**: The following are created **during the notebooks**, not during initial deployment:
+- **Notebook 1 creates**: `EMAIL_PREVIEWS_EXTRACTED`, `PARSED_ANALYST_REPORTS`, `AI_EXTRACT_ANALYST_REPORTS_ADVANCED`, `FINANCIAL_REPORTS`, `INFOGRAPHIC_METRICS_EXTRACTED`
+- **Notebook 2 creates**: `TRANSCRIBED_EARNINGS_CALLS`, `SENTIMENT_ANALYSIS`, `TRANSCRIPTS_BY_MINUTE`
+- **Notebook 4 creates**: `call_embeds`, `FULL_TRANSCRIPTS`, `INFOGRAPHICS_FOR_SEARCH`, `SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH`, and all 5 **Cortex Search Services**
 
 ### Verify Semantic Views (2)
 
@@ -622,14 +614,17 @@ The notebook is organized into 4 parts:
 - Analyze sentiment of financial communications
 - Interactive email analytics dashboard
 
-### Key Tables Created
+### Key Tables Created by This Notebook
 
-By the end of this notebook, you'll have:
+After running this notebook, you'll have created:
 
 - **PARSED_ANALYST_REPORTS** - Full text from 30 analyst reports
+- **AI_EXTRACT_ANALYST_REPORTS_ADVANCED** - Structured data extracted from reports
 - **FINANCIAL_REPORTS** - Extracted income statements and KPIs from 11 companies
 - **INFOGRAPHIC_METRICS_EXTRACTED** - Key metrics from 11 earnings infographics
 - **EMAIL_PREVIEWS_EXTRACTED** - Tickers, ratings, and sentiment from 324 emails
+
+💡 **Note**: These tables are **not** pre-loaded during initial deployment. The notebook demonstrates the full extraction process using Cortex AI.
 
 ### Follow the Notebook
 
@@ -679,12 +674,15 @@ Navigate to **AI & ML Studio** → **Notebooks** → **2_ANALYSE_SOUND**
 - Splits text into searchable chunks
 - Powers RAG (Retrieval Augmented Generation) applications
 
-### Key Tables Created
+### Key Tables Created by This Notebook
+
+After running this notebook, you'll have created:
 
 - **TRANSCRIBED_EARNINGS_CALLS** - Full transcripts with speaker IDs and timestamps
 - **SENTIMENT_ANALYSIS** - Sentiment scores for each transcript segment
 - **TRANSCRIPTS_BY_MINUTE** - Minute-by-minute sentiment tracking
-- **call_embeds** - Vector embeddings for semantic search
+
+💡 **Note**: The `call_embeds` table (vector embeddings) is actually created in **Notebook 4**, not here.
 
 ### Follow the Notebook
 
@@ -748,6 +746,17 @@ Each search service targets a specific data type and use case:
 3. **`ANALYST_REPORTS_SEARCH`** - Search reports by full text
 4. **`INFOGRAPHICS_SEARCH`** - Search infographics and branding
 5. **`EMAILS`** - Search emails by ticker, rating, or sentiment
+
+### Tables Created by This Notebook
+
+Before creating the search services, the notebook creates supporting tables:
+
+- **`call_embeds`** - Vector embeddings for semantic search
+- **`FULL_TRANSCRIPTS`** - Complete earnings call transcripts
+- **`INFOGRAPHICS_FOR_SEARCH`** - Processed infographic data
+- **`SENTIMENT_WITH_TRANSCRIPTS_FOR_SEARCH`** - Combined sentiment and transcript data
+
+💡 **Note**: These tables are prerequisites for the search services and are NOT pre-loaded during initial deployment.
 
 ### Follow the Notebook
 
@@ -2117,11 +2126,12 @@ graph TD
     end
     
     subgraph Tables["Base Tables (20+)"]
-        REPORTS["PARSED_ANALYST_REPORTS<br/>+ Financial Metrics"]
+        REPORTS["ANALYST_REPORTS<br/>(PDFs in stage)"]
         FIN["FINANCIAL_REPORTS<br/>11 companies"]
         TRANS["TRANSCRIBED_EARNINGS_CALLS<br/>+ Sentiment scores"]
         STOCK["STOCK_PRICES table"]
-        EMAIL["EMAIL_PREVIEWS_EXTRACTED"]
+        EMAIL["EMAIL_PREVIEWS<br/>(raw metadata)"]
+        NB1["Notebook 1 creates:<br/>PARSED_ANALYST_REPORTS<br/>EMAIL_PREVIEWS_EXTRACTED"]
     end
     
     subgraph Analytics["Analytics Layer"]
@@ -2590,38 +2600,27 @@ TABLES (
 )
 ```
 
-#### Issue 4: FULL_TRANSCRIPTS Missing
+#### Issue 4: Search Services Not Found
 
-**Symptom**: Search service creation fails on FULL_TRANSCRIPTS
+**Symptom**: Agent or application can't find Cortex Search services
 
 **Diagnosis**:
 ```sql
--- Check prerequisite table
-SELECT COUNT(*) FROM call_embeds;
--- Should return 317 rows
-
--- Check if FULL_TRANSCRIPTS was created
-SHOW TABLES LIKE 'FULL_TRANSCRIPTS';
+-- Check if search services exist
+SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 ```
 
-**Root Causes**:
-1. ❌ call_embeds.csv didn't load
-2. ❌ FULL_TRANSCRIPTS created before call_embeds loaded
-3. ❌ Unqualified table name in query
+**Root Cause**:
+❌ Search services are created in **Notebook 4**, not during initial deployment
 
-**Solutions**:
+**Solution**:
+1. Open **Notebook 4** (`4_CREATE_SEARCH_SERVICE`)
+2. Run all cells to create the 5 search services
+3. Verify creation:
 ```sql
--- 1. Verify CSV file exists
--- File: /dataops/event/DATA/call_embeds.csv (424 KB)
-
--- 2. Check execution order in script
--- Line ~1553: COPY INTO call_embeds
--- Line ~1649: CREATE FULL_TRANSCRIPTS (after load)
--- Line ~1730: CREATE search service (after FULL_TRANSCRIPTS)
-
--- 3. Use fully qualified names
-CREATE TABLE FULL_TRANSCRIPTS AS
-SELECT * FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.call_embeds;
+SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
+-- Should show: DOW_ANALYSTS_SENTIMENT_ANALYSIS, SNOW_FULL_EARNINGS_CALLS, 
+-- ANALYST_REPORTS_SEARCH, INFOGRAPHICS_SEARCH, EMAILS
 ```
 
 #### Issue 5: "MAIN_FILE cannot start with /"
