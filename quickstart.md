@@ -1825,19 +1825,19 @@ Navigate to **Native Apps** → **SnowMail**
 
 **Troubleshooting SnowMail**:
 
-If you see an error like "Schema does not exist or not authorized", verify permissions:
+If you see an error like "Schema does not exist or not authorized", ensure ATTENDEE_ROLE has permissions:
 
 ```sql
 USE ROLE ACCOUNTADMIN;
 
--- Ensure all required grants are in place
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
-GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
-GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
+-- SnowMail Streamlit runs with user's session, so grant to ATTENDEE_ROLE
+GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ATTENDEE_ROLE;
+GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
 ```
 
 Then refresh the SnowMail app.
+
+**Why this works**: The Streamlit app uses `get_active_session()`, which runs with your user privileges (ATTENDEE_ROLE), not the application's privileges.
 
 For detailed diagnostics, run:
 ```sql

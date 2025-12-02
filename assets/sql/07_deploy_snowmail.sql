@@ -97,23 +97,13 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 )
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
--- Grant database and schema access to the application
--- Native Apps need explicit grants on the objects they access
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
-GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
-
--- Grant table permissions on EMAIL_PREVIEWS
--- SELECT: Read emails for display in UI
--- DELETE: Allow users to delete emails from inbox
--- Note: INSERT is handled by SEND_EMAIL_NOTIFICATION procedure, not by the app
-GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
-
--- Grant warehouse access for Streamlit execution
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
-
 -- ========================================
--- Step 6: Grant Access to ATTENDEE_ROLE
+-- Step 5: Grant Access to ATTENDEE_ROLE
 -- ========================================
+
+-- The Streamlit app runs with the user's session (get_active_session)
+-- so it uses the user's privileges, not the application's privileges.
+-- ATTENDEE_ROLE already has SELECT, INSERT on EMAIL_PREVIEWS from script 02.
 
 -- Allow ATTENDEE_ROLE to use the SnowMail application
 GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;

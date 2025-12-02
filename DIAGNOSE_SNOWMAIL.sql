@@ -31,29 +31,26 @@ SELECT 'EMAIL_PREVIEWS row count:' AS info, COUNT(*) AS rows
 FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
 -- ========================================
--- STEP 4: Check for Required Grants
+-- STEP 4: Check ATTENDEE_ROLE Permissions
 -- ========================================
-SELECT '====== STEP 4: Required Grants Check ======' AS step;
+SELECT '====== STEP 4: ATTENDEE_ROLE Permissions ======' AS step;
 
--- Check if all required grants exist
+-- SnowMail Streamlit uses get_active_session(), so it runs with the user's privileges
+-- Check if ATTENDEE_ROLE has the required permissions
+
+SHOW GRANTS TO ROLE ATTENDEE_ROLE;
+
+-- Check specifically for EMAIL_PREVIEWS access
 SELECT 
     CASE 
-        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'DATABASE' AND "name" = 'ACCELERATE_AI_IN_FSI' THEN 1 ELSE 0 END) > 0 THEN '✅'
-        ELSE '❌'
-    END AS usage_on_database,
+        WHEN SUM(CASE WHEN "privilege" IN ('SELECT', 'INSERT', 'DELETE') AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) >= 3 THEN '✅ ATTENDEE_ROLE has SELECT, INSERT, DELETE on EMAIL_PREVIEWS'
+        ELSE '❌ ATTENDEE_ROLE missing permissions on EMAIL_PREVIEWS'
+    END AS table_permissions,
     CASE 
-        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'SCHEMA' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA' THEN 1 ELSE 0 END) > 0 THEN '✅'
-        ELSE '❌'
-    END AS usage_on_schema,
-    CASE 
-        WHEN SUM(CASE WHEN "privilege" = 'SELECT' AND "granted_on" = 'TABLE' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) > 0 THEN '✅'
-        ELSE '❌'
-    END AS select_on_table,
-    CASE 
-        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'WAREHOUSE' AND "name" = 'DEFAULT_WH' THEN 1 ELSE 0 END) > 0 THEN '✅'
-        ELSE '❌'
-    END AS usage_on_warehouse
-FROM (SHOW GRANTS TO APPLICATION SNOWMAIL);
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "name" = 'SNOWMAIL' THEN 1 ELSE 0 END) > 0 THEN '✅ ATTENDEE_ROLE can use SNOWMAIL app'
+        ELSE '❌ ATTENDEE_ROLE cannot use SNOWMAIL app'
+    END AS app_usage
+FROM (SHOW GRANTS TO ROLE ATTENDEE_ROLE);
 
 -- ========================================
 -- STEP 5: Test query as the application would see it
@@ -75,15 +72,16 @@ LIMIT 5;
 SELECT '====== Recommended Fixes ======' AS step;
 
 SELECT 
-'If any grants are missing (❌), run the fix script:
+'If any permissions are missing (❌), run the fix script:
 
 EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/FIX_SNOWMAIL_PERMISSIONS.sql;
 
 Or grant missing permissions manually:
-  GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
-  GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
-  GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
-  GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
+  GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ATTENDEE_ROLE;
+  GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
+
+Note: SnowMail Streamlit uses get_active_session(), which runs with the user''s 
+privileges (ATTENDEE_ROLE), not the application''s privileges.
 
 After running the fix, refresh the SnowMail app in your browser.
 ' AS instructions;
