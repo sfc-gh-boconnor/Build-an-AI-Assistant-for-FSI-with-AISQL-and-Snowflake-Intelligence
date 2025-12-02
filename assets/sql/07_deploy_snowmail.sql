@@ -26,13 +26,13 @@ CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_S
 -- Copy manifest.yml, setup.sql, and streamlit files from Git repository
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/native_app_snowmail/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/native_app_snowmail/
 FILES = ('manifest.yml', 'setup.sql');
 
 -- Copy email_viewer.py to streamlit subdirectory
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI_SNOWMAIL_PKG.APP_CODE.SNOWMAIL_STAGE/streamlit/
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/native_app_snowmail/streamlit/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/native_app_snowmail/streamlit/
 FILES = ('email_viewer.py');
 
 -- Verify files uploaded

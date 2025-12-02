@@ -29,7 +29,7 @@ create or replace stage semantic_models encryption = (type = 'snowflake_sse') di
 -- Copy YAML file from Git repository
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.semantic_models
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/semantic_models/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/semantic_models/
 FILES = ('analyst_sentiments.yaml');
 
 alter stage semantic_models refresh;
@@ -63,7 +63,7 @@ create or replace file format ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_FORMAT
 -- Upload CSV files to stage from Git repository
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
 FILES = ('fsi_data.csv', 'ai_transcripts_analysts_sentiments.csv', 'unique_transcripts.csv');
 
 -- Create table for FSI data (matching CSV column order)
