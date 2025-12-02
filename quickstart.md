@@ -957,33 +957,9 @@ This powers the agent's ability to answer:
 
 <!-- ------------------------ -->
 ## Use Snowflake Intelligence Agent
+Duration: 20
 
-Navigate to:
-
-```
-AI & ML Studio → Notebooks → 4_CREATE_SEARCH_SERVICE
-```
-
-### What This Notebook Does
-
-Creates 5 Cortex Search Services for different data types.
-
-#### Example: Email Search Service
-
-```python
-session.sql("""
-    CREATE OR REPLACE CORTEX SEARCH SERVICE EMAILS
-    ON HTML_CONTENT
-    ATTRIBUTES TICKER, RATING, SENTIMENT, SUBJECT, CREATED_AT, RECIPIENT_EMAIL
-    WAREHOUSE = DEFAULT_WH
-    TARGET_LAG = '1 hour'
-    AS (
-        SELECT * FROM EMAIL_PREVIEWS_EXTRACTED
-    )
-""").collect()
-```
-
-### Test Search Services
+### Overview: The One Ticker Stock Agent
 
 Use the Cortex Search Playground:
 
@@ -1074,65 +1050,6 @@ Try asking in natural language:
 2. Try: "What is the latest closing price of Snowflake stock?"
 3. View the generated SQL
 4. Observe the results
-
-<!-- ------------------------ -->
-## Build a Quantitative ML Model
-Duration: 15
-
-### Open Notebook: Build Quantitative Model
-
-Navigate to:
-
-```
-Notebooks → build_quantitive_model
-```
-
-### What You'll Learn
-
-- How to prepare time-series financial data for ML
-- Feature engineering for stock prediction
-- Training models with Snowpark ML
-- Using GPU acceleration for faster training
-- Registering models in Snowflake Model Registry
-- Making batch predictions on new data
-
-### The Data
-
-- **6,420 rows** of Snowflake stock prices
-- Features: High, Low, Volume, Pre-market, Post-market
-- Time period: Multiple years of historical data
-- Target: Predict next day's closing price
-
-### What You'll Build
-
-A **stock price prediction model** using:
-- **XGBoost** algorithm
-- **GPU acceleration** (CUDA_VERSION=11.8)
-- **Model Registry** for versioning
-- **Batch inference** via SQL functions
-
-### Model Deployment
-
-After training, you can predict prices using SQL:
-
-```sql
-SELECT 
-    DATE,
-    TICKER,
-    STOCK_PERFORMANCE_PREDICTOR(
-        ALL_DAY_HIGH, 
-        ALL_DAY_LOW, 
-        NASDAQ_VOLUME,
-        PRE_MARKET_OPEN,
-        POST_MARKET_CLOSE
-    ) AS predicted_price
-FROM STOCK_PRICES
-WHERE TICKER = 'SNOW';
-```
-
-### Time-Saving Note
-
-⚡ **Pre-trained model included!** The pipeline includes a pre-trained model in the Model Registry, so you can skip training and jump straight to predictions if needed. Training uses GPU acceleration for speed.
 
 <!-- ------------------------ -->
 ## Use Snowflake Intelligence Agent
