@@ -181,7 +181,7 @@ try:
     emails_df = session.sql(emails_query).to_pandas()
     
     if len(emails_df) == 0:
-        st.info("📭 Your SnowMail inbox is empty. Use the Population Health, Clinical Trials, or Cost of Care agents to generate email reports.")
+        st.info("📭 Your SnowMail inbox is empty. Use the Cortex Agent to generate and send email reports, or run Script 02 to load sample emails.")
     else:
         # Format timestamps
         emails_df['CREATED_AT'] = pd.to_datetime(emails_df['CREATED_AT'])
