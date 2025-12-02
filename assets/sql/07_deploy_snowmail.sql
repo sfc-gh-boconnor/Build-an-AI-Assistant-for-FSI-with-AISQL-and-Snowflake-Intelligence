@@ -98,21 +98,23 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
 -- ========================================
--- Step 5: Bind References to Consumer Objects
+-- Step 5: Grant Permissions (Via UI)
 -- ========================================
 
--- Native Apps use REFERENCES to access consumer data
--- The setup.sql declares what it needs, we bind it here
+-- Native Apps require permissions to be granted via the Snowflake UI
+-- After deployment, navigate to: Apps → SNOWMAIL → Security/Privileges
+-- Grant the following to the application:
+--   - USAGE on ACCELERATE_AI_IN_FSI database
+--   - USAGE on ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA schema
+--   - SELECT, DELETE on ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS table
+--   - USAGE on DEFAULT_WH warehouse
 
-USE ROLE ACCOUNTADMIN;
+-- Note: SQL-based grants are not supported for applications in this Snowflake version
+-- The UI-based grant mechanism is the supported method
 
--- Bind the EMAIL_PREVIEWS table reference
--- This tells the app which actual table to use for the reference
-ALTER APPLICATION SNOWMAIL
-  SET REFERENCE 'EMAIL_PREVIEWS_TABLE' = ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
-
--- Grant usage on the warehouse for Streamlit execution
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
+SELECT '✅ SnowMail deployed successfully!' AS status,
+       '⚠️  IMPORTANT: Grant permissions via UI' AS next_step,
+       'Navigate to: Apps → SNOWMAIL → Security → Grant Privileges' AS instructions;
 
 -- ========================================
 -- Deployment Complete
