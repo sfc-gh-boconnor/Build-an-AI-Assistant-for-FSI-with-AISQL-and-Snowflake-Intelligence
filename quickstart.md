@@ -721,6 +721,69 @@ Simply run through the cells to see how audio becomes searchable, analyzable dat
 **Time**: 10-15 minutes to complete.
 
 <!-- ------------------------ -->
+## Build a Quantitative ML Model (Notebook 3)
+Duration: 15
+
+### Overview
+
+Build and deploy a **machine learning model** for stock price prediction using **Snowflake ML**. This notebook demonstrates GPU-accelerated model training and the Model Registry.
+
+⚠️ **Note**: This notebook requires GPU compute pools which may not be available in all regions. If GPU is not available, a **pre-trained model** (`STOCK_RETURN_PREDICTOR_GBM`) is already deployed for you!
+
+**What You'll Build:**
+- 📊 **Feature Engineering** - Create technical indicators from price data
+- 🤖 **ML Model Training** - Gradient boosting for stock return prediction
+- 📦 **Model Registry** - Version and deploy models
+- 🔮 **Batch Predictions** - Generate stock rankings
+- ⚡ **GPU Acceleration** - 10-100x faster training
+
+### Open Notebook 3
+
+Navigate to **AI & ML Studio** → **Notebooks** → **3_BUILD_A_QUANTITIVE_MODEL**
+
+### What the Notebook Demonstrates
+
+**Feature Engineering**:
+- Momentum ratios: r_1, r_5_1, r_10_5, r_21_10, r_63_21
+- Forward-looking returns for prediction targets
+- Handling stock splits in historical data
+
+**Model Training**:
+- Gradient Boosting Models (GBM) using LightGBM
+- Training on historical technical indicators
+- Model evaluation and validation
+
+**Model Registry**:
+- Versioning trained models
+- Deploying to production
+- Creating SQL functions for predictions
+
+**GPU Benefits**:
+- 10-100x faster training vs CPU
+- Real-time hyperparameter experimentation
+- Production-grade ML infrastructure
+
+### The Pre-Trained Model
+
+If GPU is not available, the agent can still use:
+
+**Function**: `GET_TOP_BOTTOM_STOCK_PREDICTIONS(model_name, top_n)`
+- Uses pre-trained `STOCK_RETURN_PREDICTOR_GBM` model
+- Analyzes technical indicators for all stocks
+- Returns top N and bottom N predicted performers
+
+This powers the agent's ability to answer:
+> "Give me top 3 vs bottom 3 trade predictions for the next period."
+
+### Follow the Notebook
+
+1. Run through cells to see model training
+2. Observe model registry integration
+3. Test predictions with the SQL function
+
+**Time**: 15-20 minutes if training from scratch (pre-trained model saves time!)
+
+<!-- ------------------------ -->
 ## Build Cortex Search Services (Notebook 4)
 Duration: 10
 
@@ -934,72 +997,6 @@ The playground shows the generated SQL and results.
 ✅ **Named Filters** (like TICKER_SNOW) simplify common queries  
 
 **Next**: These semantic views become tools for the Snowflake Intelligence Agent, enabling it to answer complex questions about financial data!
-
-<!-- ------------------------ -->
-## Build a Quantitative ML Model (Notebook 3 - Optional)
-Duration: 15
-
-### Overview
-
-Build and deploy a **machine learning model** for stock price prediction using **Snowflake ML**. This notebook demonstrates GPU-accelerated model training and the Model Registry.
-
-⚠️ **Note**: This notebook requires GPU compute pools which may not be available in all regions. If GPU is not available, a **pre-trained model** (`STOCK_RETURN_PREDICTOR_GBM`) is already deployed for you!
-
-**What You'll Build:**
-- 📊 **Feature Engineering** - Create technical indicators from price data
-- 🤖 **ML Model Training** - Gradient boosting for stock return prediction
-- 📦 **Model Registry** - Version and deploy models
-- 🔮 **Batch Predictions** - Generate stock rankings
-- ⚡ **GPU Acceleration** - 10-100x faster training
-
-### Open Notebook 3 (If GPU Available)
-
-Navigate to **AI & ML Studio** → **Notebooks** → **3_BUILD_A_QUANTITIVE_MODEL**
-
-### What the Notebook Demonstrates
-
-**Feature Engineering**:
-- Momentum ratios: r_1, r_5_1, r_10_5, r_21_10, r_63_21
-- Forward-looking returns for prediction targets
-- Handling stock splits in historical data
-
-**Model Training**:
-- Gradient Boosting Models (GBM) using LightGBM
-- Training on historical technical indicators
-- Model evaluation and validation
-
-**Model Registry**:
-- Versioning trained models
-- Deploying to production
-- Creating SQL functions for predictions
-
-**GPU Benefits**:
-- 10-100x faster training vs CPU
-- Real-time hyperparameter experimentation
-- Production-grade ML infrastructure
-
-### The Pre-Trained Model
-
-Even if you skip this notebook, the agent can still use:
-
-**Function**: `GET_TOP_BOTTOM_STOCK_PREDICTIONS(model_name, top_n)`
-- Uses pre-trained `STOCK_RETURN_PREDICTOR_GBM` model
-- Analyzes technical indicators for all stocks
-- Returns top N and bottom N predicted performers
-
-This powers the agent's ability to answer:
-> "Give me top 3 vs bottom 3 trade predictions for the next period."
-
-### Follow the Notebook (If Running)
-
-1. Ensure you have GPU compute pool access
-2. Run through cells to see model training
-3. Observe model registry integration
-4. Test predictions with the SQL function
-
-**Time**: 15-20 minutes if training from scratch (pre-trained model saves time!)
-
-**Next**: Use the Snowflake Intelligence Agent to interact with all the data and models you've created!
 
 <!-- ------------------------ -->
 ## Use Snowflake Intelligence Agent
