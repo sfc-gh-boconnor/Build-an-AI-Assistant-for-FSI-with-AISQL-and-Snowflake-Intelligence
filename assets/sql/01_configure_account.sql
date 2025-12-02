@@ -45,7 +45,9 @@ GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE ACCOUNTADMIN;
 -- Create Database and Schemas
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI
+-- CREATE OR REPLACE ensures a clean slate each time
+-- Git repo is safely in SNOWFLAKE_QUICKSTART_REPOS (won't be affected)
+CREATE OR REPLACE DATABASE ACCELERATE_AI_IN_FSI
 COMMENT = 'FSI Cortex Assistant - Multi-Modal AI Platform';
 
 USE DATABASE ACCELERATE_AI_IN_FSI;
