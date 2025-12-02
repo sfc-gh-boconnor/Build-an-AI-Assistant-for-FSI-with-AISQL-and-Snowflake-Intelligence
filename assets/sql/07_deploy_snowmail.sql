@@ -98,15 +98,16 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
 -- ========================================
--- Step 5: Grant Access to ATTENDEE_ROLE
+-- Step 5: Application Access
 -- ========================================
 
 -- The Streamlit app runs with the user's session (get_active_session)
 -- so it uses the user's privileges, not the application's privileges.
 -- ATTENDEE_ROLE already has SELECT, INSERT on EMAIL_PREVIEWS from script 02.
 
--- Allow ATTENDEE_ROLE to use the SnowMail application
-GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
+-- Note: Application access is managed automatically in Native Apps
+-- Users can access the app through the Native Apps UI once it's deployed
+-- No explicit GRANT ON APPLICATION needed
 
 -- ========================================
 -- Deployment Complete

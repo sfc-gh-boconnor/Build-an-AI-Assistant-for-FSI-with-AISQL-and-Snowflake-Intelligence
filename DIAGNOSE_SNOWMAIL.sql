@@ -45,11 +45,7 @@ SELECT
     CASE 
         WHEN SUM(CASE WHEN "privilege" IN ('SELECT', 'INSERT', 'DELETE') AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) >= 3 THEN '✅ ATTENDEE_ROLE has SELECT, INSERT, DELETE on EMAIL_PREVIEWS'
         ELSE '❌ ATTENDEE_ROLE missing permissions on EMAIL_PREVIEWS'
-    END AS table_permissions,
-    CASE 
-        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "name" = 'SNOWMAIL' THEN 1 ELSE 0 END) > 0 THEN '✅ ATTENDEE_ROLE can use SNOWMAIL app'
-        ELSE '❌ ATTENDEE_ROLE cannot use SNOWMAIL app'
-    END AS app_usage
+    END AS table_permissions
 FROM (SHOW GRANTS TO ROLE ATTENDEE_ROLE);
 
 -- ========================================
@@ -72,16 +68,17 @@ LIMIT 5;
 SELECT '====== Recommended Fixes ======' AS step;
 
 SELECT 
-'If any permissions are missing (❌), run the fix script:
+'If permissions are missing (❌), run the fix script:
 
 EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/FIX_SNOWMAIL_PERMISSIONS.sql;
 
 Or grant missing permissions manually:
   GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ATTENDEE_ROLE;
-  GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
 
 Note: SnowMail Streamlit uses get_active_session(), which runs with the user''s 
 privileges (ATTENDEE_ROLE), not the application''s privileges.
+
+Application access is managed automatically through the Native Apps UI.
 
 After running the fix, refresh the SnowMail app in your browser.
 ' AS instructions;

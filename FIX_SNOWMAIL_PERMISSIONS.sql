@@ -31,8 +31,8 @@ COMMENT = 'Email previews for SnowMail Native App';
 -- Ensure ATTENDEE_ROLE has access to the table
 GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ATTENDEE_ROLE;
 
--- Ensure ATTENDEE_ROLE can use the application
-GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
+-- Note: Application access is managed automatically in Native Apps
+-- No GRANT ON APPLICATION needed - users access via Native Apps UI
 
 -- Verify grants
 SHOW GRANTS TO APPLICATION SNOWMAIL;
