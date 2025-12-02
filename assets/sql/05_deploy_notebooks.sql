@@ -1,4 +1,4 @@
-ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"sql"}}''';
+ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"sql"}}''';
 
 -- Use ACCOUNTADMIN for creating compute pools and notebooks
 use role ACCOUNTADMIN;
@@ -57,7 +57,7 @@ CREATE OR REPLACE NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."1_EXTRACT_DATA_F
 FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK1'
 MAIN_FILE = '1_EXTRACT_DATA_FROM_DOCUMENTS.ipynb'
 QUERY_WAREHOUSE = 'NOTEBOOKS_WH'
-COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"notebook"}}''';
+COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"notebook"}}''';
 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."1_EXTRACT_DATA_FROM_DOCUMENTS" ADD LIVE VERSION FROM LAST;
 
@@ -66,7 +66,7 @@ CREATE OR REPLACE NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."2_ANALYSE_SOUND"
 FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK2'
 MAIN_FILE = '2_ANALYSE_SOUND.ipynb'
 QUERY_WAREHOUSE = 'NOTEBOOKS_WH'
-COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"notebook"}}''';
+COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"notebook"}}''';
 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."2_ANALYSE_SOUND" ADD LIVE VERSION FROM LAST;
 
@@ -74,7 +74,7 @@ CREATE OR REPLACE NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."4_CREATE_SEARCH_
 FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK4'
 MAIN_FILE = '4_CREATE_SEARCH_SERVICE.ipynb'
 QUERY_WAREHOUSE = 'NOTEBOOKS_WH'
-COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"notebook"}}''';
+COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"notebook"}}''';
 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."4_CREATE_SEARCH_SERVICE" ADD LIVE VERSION FROM LAST;
 
@@ -82,7 +82,7 @@ CREATE OR REPLACE NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."5_CORTEX_ANALYST
 FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.NOTEBOOK5'
 MAIN_FILE = '5_CORTEX_ANALYST.ipynb'
 QUERY_WAREHOUSE = 'NOTEBOOKS_WH'
-COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"notebook"}}''';
+COMMENT = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"notebook"}}''';
 
 ALTER NOTEBOOK ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA."5_CORTEX_ANALYST" ADD LIVE VERSION FROM LAST;
 

@@ -1,4 +1,4 @@
-ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"sql"}}''';
+ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"sql"}}''';
 use role ATTENDEE_ROLE;
 
 create schema if not exists ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
@@ -36,7 +36,7 @@ FROM '@ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2'
 MAIN_FILE = 'app.py'
 TITLE = 'StockOne - AI Financial Assistant'
 QUERY_WAREHOUSE = DEFAULT_WH
-COMMENT = '{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":0, "source":"streamlit"}, "features":["cortex_agents_rest_api","feedback_api","5_search_services","2_semantic_views"]}';
+COMMENT = '{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"streamlit"}, "features":["cortex_agents_rest_api","feedback_api","5_search_services","2_semantic_views"]}';
 
 -- Note: Simple agent (1_CORTEX_AGENT_SIMPLE) has been sunset in favor of the sophisticated agent with REST API features
 -- Note: Streamlit executes with ATTENDEE_ROLE which has CORTEX_USER role and access to all search services and semantic views
