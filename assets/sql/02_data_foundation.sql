@@ -445,6 +445,7 @@ SELECT
     s.sentiment_score,
     s.unique_analyst_count,
     s.sentiment_reason,
+    t.transcript AS FULL_TRANSCRIPT_TEXT,
     LENGTH(t.transcript) AS transcript_length
 FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts t
 LEFT JOIN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALYSTS_SENTIMENTS s
