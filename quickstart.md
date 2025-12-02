@@ -1825,22 +1825,34 @@ Navigate to **Native Apps** → **SnowMail**
 
 **Troubleshooting SnowMail**:
 
-If you see "Database does not exist or not authorized", grant permissions to the application role:
+If you see "Database does not exist or not authorized", you need to grant permissions to the application through the Snowflake UI:
+
+**Grant Permissions via UI:**
+1. Navigate to **Apps** → **Installed Apps** (or **Native Apps**)
+2. Find and click **SNOWMAIL**
+3. Click **Security** or **Manage Access**
+4. Grant the following:
+   - Database: `ACCELERATE_AI_IN_FSI` (USAGE)
+   - Schema: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA` (USAGE)
+   - Table: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS` (SELECT, DELETE)
+   - Warehouse: `DEFAULT_WH` (USAGE)
+5. Save/Apply the grants
+
+**Alternative - SQL Method (if supported):**
+
+If your Snowflake version supports SQL grants to applications:
 
 ```sql
 USE ROLE ACCOUNTADMIN;
-USE DATABASE ACCELERATE_AI_IN_FSI;
 
--- Grant to the application role (not to ATTENDEE_ROLE or APPLICATION)
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
+-- Try granting TO APPLICATION (older syntax)
+GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
+GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
+GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 ```
 
-Then refresh the SnowMail app.
-
-**Why this works**: Native Apps access consumer data through **APPLICATION ROLE** grants. The `app_public` role is defined in the app's setup.sql.
+**Why this works**: Native App permission models vary by Snowflake version. The UI method works across all versions.
 
 For detailed diagnostics, run:
 ```sql

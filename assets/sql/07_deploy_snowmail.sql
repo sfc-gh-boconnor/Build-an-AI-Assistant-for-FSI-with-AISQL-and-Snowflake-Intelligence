@@ -101,37 +101,31 @@ COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTI
 -- Step 5: Grant Consumer Data Access to Application
 -- ========================================
 
--- Native Apps access consumer data through APPLICATION ROLE grants
--- The setup.sql creates app_public application role
+-- Native Apps access consumer data through grants
+-- Permission model varies by Snowflake version
 
--- Must use ACCOUNTADMIN for all application-related operations
 USE ROLE ACCOUNTADMIN;
 
 -- Set context
 USE DATABASE ACCELERATE_AI_IN_FSI;
 USE SCHEMA DEFAULT_SCHEMA;
 
--- For Native Apps, we need to grant from the database/schema owner
--- Since ATTENDEE_ROLE owns these objects, we need to grant as that role
--- OR give ACCOUNTADMIN the MANAGE GRANTS privilege
+-- Attempt to grant to APPLICATION (works in some Snowflake versions)
+-- If this fails, you'll need to grant via the Snowflake UI:
+-- Apps → SNOWMAIL → Security → Grant access to database/schema/table/warehouse
 
--- Alternative approach: Use ATTENDEE_ROLE to grant, since it owns the database
--- But first grant ATTENDEE_ROLE the ability to grant to application roles
-GRANT MANAGE GRANTS ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-
--- Now switch to ATTENDEE_ROLE to grant (as the owner)
-USE ROLE ATTENDEE_ROLE;
-
--- Grant database and schema access to the application role
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SNOWMAIL.app_public;
-
--- Grant table access to the application role
-GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
-
--- Switch back to ACCOUNTADMIN for warehouse grant
-USE ROLE ACCOUNTADMIN;
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
+BEGIN
+    GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+    GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
+    GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
+    GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
+EXCEPTION
+    WHEN OTHER THEN
+        -- Grants failed - user needs to grant via UI
+        SELECT 'ℹ️  IMPORTANT: Grant permissions to SnowMail via Snowflake UI' AS notice,
+               'Navigate to: Apps → SNOWMAIL → Security → Manage Access' AS instructions,
+               'Grant: USAGE on database/schema, SELECT/DELETE on EMAIL_PREVIEWS, USAGE on warehouse' AS permissions;
+END;
 
 -- ========================================
 -- Deployment Complete
