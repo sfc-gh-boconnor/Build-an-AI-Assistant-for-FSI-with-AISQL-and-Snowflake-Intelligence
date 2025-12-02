@@ -2269,45 +2269,6 @@ graph TD
 - ✅ Apps have full access to owned objects
 - ✅ Easy to understand and maintain
 
-### REST API Architecture
-
-```mermaid
-sequenceDiagram
-    participant App as Streamlit App
-    participant API as Cortex Agent REST API
-    participant Agent as One Ticker Agent
-    participant Tools as Agent Tools
-    
-    App->>API: POST /api/v2/cortex/agent:run
-    Note over App,API: Payload: {model, tools,<br/>tool_resources, messages}
-    
-    API->>Agent: Execute agent
-    Agent->>Tools: Use tools (Search, Analyst, ML)
-    Tools-->>Agent: Return results
-    Agent-->>API: Stream response chunks
-    
-    loop Stream Chunks
-        API-->>App: {delta: content}
-        Note over App: Parse: text, tool_results,<br/>suggestions
-    end
-    
-    App->>API: POST /api/v2/cortex/agent/feedback
-    Note over App,API: User feedback (👍👎)
-    API-->>App: Feedback recorded
-    
-    style App fill:#fce4ec
-    style API fill:#e3f2fd
-    style Agent fill:#e8f5e9
-    style Tools fill:#fff3e0
-```
-        │
-        └─→ POST /api/v2/databases/{db}/schemas/{schema}/agents/{name}:feedback
-            │
-            └─→ Payload: {orig_request_id, positive, categories}
-                │
-                └─→ Response: {"status": "Feedback submitted successfully"}
-```
-
 <!-- ------------------------ -->
 ## Customization Guide
 Duration: 10
