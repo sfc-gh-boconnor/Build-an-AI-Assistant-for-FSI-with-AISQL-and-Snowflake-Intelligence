@@ -133,7 +133,7 @@ graph TB
 ### Key Technologies
 
 - **Cortex AI Functions**: AI_EXTRACT, AI_PARSE_DOCUMENT, AI_TRANSCRIBE, AI_SENTIMENT, AI_COMPLETE
-- **Cortex Search**: 5 search services for semantic search and RAG
+- **Cortex Search**: 5 search services (created in Notebook 4) for semantic search and RAG
 - **Cortex Analyst**: 2 semantic views for natural language SQL
 - **Snowflake Intelligence**: Conversational agents with tool orchestration
 - **Document AI**: Automated document processing at scale
@@ -268,13 +268,14 @@ EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
 1. ✅ Database `ACCELERATE_AI_IN_FSI` with 3 schemas
 2. ✅ Role `ATTENDEE_ROLE` with CORTEX_USER privileges
 3. ✅ 20+ tables with ~10,000 rows of data
-4. ✅ 5 Cortex Search Services
-5. ✅ 2 Cortex Analyst Semantic Views
-6. ✅ 1 Snowflake Intelligence Agent (8 tools)
-7. ✅ 1 Streamlit application (StockOne)
-8. ✅ 4 Snowflake Notebooks
-9. ✅ 132 documents uploaded to stages
-10. ✅ 1 SnowMail Native App
+4. ✅ 2 Cortex Analyst Semantic Views
+5. ✅ 1 Snowflake Intelligence Agent
+6. ✅ 2 Streamlit applications
+7. ✅ 4-5 Notebooks (GPU notebook optional)
+8. ✅ 1 Native App (SnowMail email viewer)
+9. ✅ Stages with PDFs, audio files, and images
+
+⚠️ **Note**: Search services are created later in **Notebook 4**, not during initial deployment.
 
 **Deployment time**: 15-20 minutes
 
@@ -289,11 +290,13 @@ After deployment completes, verify in Snowflake UI:
 USE DATABASE ACCELERATE_AI_IN_FSI;
 
 SHOW TABLES IN SCHEMA DEFAULT_SCHEMA;           -- Should see 20+ tables
-SHOW CORTEX SEARCH SERVICES;                    -- Should see 5 services
 SHOW SEMANTIC VIEWS IN SCHEMA CORTEX_ANALYST;   -- Should see 2 views
 SHOW STREAMLITS IN SCHEMA STREAMLIT;            -- Should see STOCKONE_AGENT
-SHOW NOTEBOOKS IN SCHEMA NOTEBOOKS;             -- Should see 4 notebooks
+SHOW NOTEBOOKS IN SCHEMA NOTEBOOKS;             -- Should see 4-5 notebooks
+SHOW AGENTS IN SCHEMA SNOWFLAKE_INTELLIGENCE.AGENTS; -- Should see FSI_STOCK_AGENT
 ```
+
+⚠️ **Note**: Cortex Search Services will appear **after** you run Notebook 4.
 
 **All set?** ✅ Continue to the next section!
 
