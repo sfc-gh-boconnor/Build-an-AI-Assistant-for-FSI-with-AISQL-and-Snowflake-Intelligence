@@ -31,20 +31,29 @@ SELECT 'EMAIL_PREVIEWS row count:' AS info, COUNT(*) AS rows
 FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
 -- ========================================
--- STEP 4: Check for REFERENCE_USAGE grant
+-- STEP 4: Check for Required Grants
 -- ========================================
-SELECT '====== STEP 4: REFERENCE_USAGE Check ======' AS step;
+SELECT '====== STEP 4: Required Grants Check ======' AS step;
 
--- This query will show if REFERENCE_USAGE is granted
+-- Check if all required grants exist
 SELECT 
     CASE 
-        WHEN COUNT(*) > 0 THEN '✅ REFERENCE_USAGE is granted'
-        ELSE '❌ REFERENCE_USAGE is MISSING (this is the problem!)'
-    END AS status
-FROM (SHOW GRANTS TO APPLICATION SNOWMAIL)
-WHERE "privilege" = 'REFERENCE_USAGE' 
-  AND "granted_on" = 'DATABASE'
-  AND "name" = 'ACCELERATE_AI_IN_FSI';
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'DATABASE' AND "name" = 'ACCELERATE_AI_IN_FSI' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS usage_on_database,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'SCHEMA' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS usage_on_schema,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" = 'SELECT' AND "granted_on" = 'TABLE' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS select_on_table,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'WAREHOUSE' AND "name" = 'DEFAULT_WH' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS usage_on_warehouse
+FROM (SHOW GRANTS TO APPLICATION SNOWMAIL);
 
 -- ========================================
 -- STEP 5: Test query as the application would see it
@@ -66,16 +75,15 @@ LIMIT 5;
 SELECT '====== Recommended Fixes ======' AS step;
 
 SELECT 
-'If REFERENCE_USAGE is missing, run ONE of these commands:
+'If any grants are missing (❌), run the fix script:
 
-Option 1 - Quick Fix (run just the missing grant):
-  GRANT REFERENCE_USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/FIX_SNOWMAIL_PERMISSIONS.sql;
 
-Option 2 - Run the complete fix script:
-  EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/FIX_SNOWMAIL_PERMISSIONS.sql;
-
-Option 3 - Redeploy SnowMail completely:
-  EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/07_deploy_snowmail.sql;
+Or grant missing permissions manually:
+  GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+  GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
+  GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
+  GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 
 After running the fix, refresh the SnowMail app in your browser.
 ' AS instructions;

@@ -1825,14 +1825,19 @@ Navigate to **Native Apps** → **SnowMail**
 
 **Troubleshooting SnowMail**:
 
-If you see an error like "Schema does not exist or not authorized", run this quick fix:
+If you see an error like "Schema does not exist or not authorized", verify permissions:
 
 ```sql
 USE ROLE ACCOUNTADMIN;
-GRANT REFERENCE_USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+
+-- Ensure all required grants are in place
+GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
+GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
+GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 ```
 
-Then refresh the SnowMail app. This grants the Native App permission to access the consumer database.
+Then refresh the SnowMail app.
 
 For detailed diagnostics, run:
 ```sql
