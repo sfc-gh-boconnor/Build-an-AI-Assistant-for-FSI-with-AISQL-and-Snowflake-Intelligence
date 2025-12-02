@@ -1823,6 +1823,22 @@ Navigate to **Native Apps** → **SnowMail**
 3. Filter by ticker, sentiment, rating
 4. View email content and metadata
 
+**Troubleshooting SnowMail**:
+
+If you see an error like "Schema does not exist or not authorized", run this quick fix:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+GRANT REFERENCE_USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
+```
+
+Then refresh the SnowMail app. This grants the Native App permission to access the consumer database.
+
+For detailed diagnostics, run:
+```sql
+EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/DIAGNOSE_SNOWMAIL.sql;
+```
+
 ### ML Model Predictions
 
 Use the pre-trained model for stock predictions:
