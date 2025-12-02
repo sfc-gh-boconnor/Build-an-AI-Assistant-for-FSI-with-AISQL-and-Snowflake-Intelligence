@@ -1,7 +1,7 @@
 -- =====================================================
 -- FSI Cortex Assistant - Account Configuration
 -- =====================================================
--- Run as ACCOUNTADMIN
+-- Run as ACCOUNTADMIN (all scripts use ACCOUNTADMIN)
 -- =====================================================
 
 USE ROLE ACCOUNTADMIN;
@@ -34,61 +34,26 @@ USE WAREHOUSE DEFAULT_WH;
 -- Request Cybersyn listing (financial data)
 CALL SYSTEM$REQUEST_LISTING_AND_WAIT('GZTYZ1US93D', 60);
 
-
 -- =====================================================
--- Create Attendee Role
+-- Grant Cortex AI privileges to ACCOUNTADMIN
 -- =====================================================
 
-USE ROLE SECURITYADMIN;
-
-CREATE ROLE IF NOT EXISTS ATTENDEE_ROLE
-COMMENT = 'Role for FSI Cortex Assistant attendees';
-
--- Grant to ACCOUNTADMIN for visibility
-GRANT ROLE ATTENDEE_ROLE TO ROLE ACCOUNTADMIN;
-
--- Grant privileges
-USE ROLE ACCOUNTADMIN;
-
-GRANT CREATE DATABASE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT CREATE ROLE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT MANAGE GRANTS ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT IMPORT SHARE ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-GRANT CREATE COMPUTE POOL ON ACCOUNT TO ROLE ATTENDEE_ROLE;
--- Note: CREATE STREAMLIT is granted at SCHEMA level (see after schema creation)
-
--- Grant warehouse usage
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO ROLE ATTENDEE_ROLE;
-GRANT USAGE ON WAREHOUSE NOTEBOOKS_WH TO ROLE ATTENDEE_ROLE;
-GRANT OPERATE ON WAREHOUSE DEFAULT_WH TO ROLE ATTENDEE_ROLE;
-GRANT OPERATE ON WAREHOUSE NOTEBOOKS_WH TO ROLE ATTENDEE_ROLE;
-
--- Grant Cortex AI privileges
-GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ATTENDEE_ROLE;
-GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE ATTENDEE_ROLE;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ACCOUNTADMIN;
+GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE ACCOUNTADMIN;
 
 -- =====================================================
 -- Create Database and Schemas
 -- =====================================================
 
--- Create database as ACCOUNTADMIN first
-USE ROLE ACCOUNTADMIN;
-
 CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI
 COMMENT = 'FSI Cortex Assistant - Multi-Modal AI Platform';
 
--- Grant ownership to ATTENDEE_ROLE
-GRANT OWNERSHIP ON DATABASE ACCELERATE_AI_IN_FSI TO ROLE ATTENDEE_ROLE COPY CURRENT GRANTS;
-
--- Now switch to ATTENDEE_ROLE and create schemas
-USE ROLE ATTENDEE_ROLE;
 USE DATABASE ACCELERATE_AI_IN_FSI;
 
 CREATE SCHEMA IF NOT EXISTS DEFAULT_SCHEMA;
 CREATE SCHEMA IF NOT EXISTS DOCUMENT_AI;
 CREATE SCHEMA IF NOT EXISTS CORTEX_ANALYST;
+CREATE SCHEMA IF NOT EXISTS GIT_REPOS;
 
 -- =====================================================
 -- Add descriptive comments to schemas
@@ -130,16 +95,6 @@ $$Cortex Analyst schema containing:
   - SNOWFLAKE_ANALYSTS_VIEW (Snowflake deep-dive)
 • Purpose: Text-to-SQL with Cortex Analyst
 • Users can ask questions in plain English$$;
-
--- =====================================================
--- Grant Schema-Level Privileges
--- =====================================================
-
--- Grant CREATE STREAMLIT on schemas (not available at ACCOUNT level)
-GRANT CREATE STREAMLIT ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
-
--- Grant CREATE NOTEBOOK on schemas
-GRANT CREATE NOTEBOOK ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
 
 -- =====================================================
 -- Configuration Complete!

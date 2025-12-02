@@ -1,5 +1,5 @@
 ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"sql"}}''';
-use role ATTENDEE_ROLE;
+USE ROLE ACCOUNTADMIN;
 
 create schema if not exists ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 
@@ -23,9 +23,9 @@ FILES = ('config.toml');
 
 -----GRANT CORTEX PERMISSIONS FOR STREAMLIT
 -- Grant CORTEX_USER role for Cortex AI functions and REST API access
-GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ATTENDEE_ROLE;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ACCOUNTADMIN;
 
--- Note: No object grants needed - ATTENDEE_ROLE owns all objects (search services, semantic views, tables)
+-- Note: No object grants needed - ACCOUNTADMIN owns all objects (search services, semantic views, tables)
 -- created in data_foundation.template.sql and deploy_cortex_analyst.template.sql
 -- Owner automatically has all privileges
 
@@ -39,4 +39,4 @@ QUERY_WAREHOUSE = DEFAULT_WH
 COMMENT = '{"origin":"sf_sit-is", "name":"Build an AI Assistant for FSI using AISQL and Snowflake Intelligence", "version":{"major":1, "minor":0},"attributes":{"is_quickstart":1, "source":"streamlit"}, "features":["cortex_agents_rest_api","feedback_api","5_search_services","2_semantic_views"]}';
 
 -- Note: Simple agent (1_CORTEX_AGENT_SIMPLE) has been sunset in favor of the sophisticated agent with REST API features
--- Note: Streamlit executes with ATTENDEE_ROLE which has CORTEX_USER role and access to all search services and semantic views
+-- Note: Streamlit executes with ACCOUNTADMIN which has CORTEX_USER role and access to all search services and semantic views

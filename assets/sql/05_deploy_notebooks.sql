@@ -45,11 +45,11 @@ FILES = ('5_CORTEX_ANALYST.ipynb', 'environment.yml');
 
 
 
--- Grant notebook creation privileges to ATTENDEE_ROLE
-GRANT CREATE NOTEBOOK ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
+-- Grant notebook creation privileges to ACCOUNTADMIN
+GRANT CREATE NOTEBOOK ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ACCOUNTADMIN;
 
--- Switch to ATTENDEE_ROLE to create notebooks (so they own them)
-USE ROLE ATTENDEE_ROLE;
+-- Continue with ACCOUNTADMIN to create notebooks
+USE ROLE ACCOUNTADMIN;
 
 --create notebooks (non-GPU notebooks only - GPU notebook in 05b)
 

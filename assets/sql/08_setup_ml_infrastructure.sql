@@ -8,38 +8,17 @@ USE ROLE ACCOUNTADMIN;
 use role ACCOUNTADMIN;
 
 
-GRANT CREATE COMPUTE POOL ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-grant MANAGE GRANTS on account to role ATTENDEE_ROLE;
-grant CREATE INTEGRATION on account to role ATTENDEE_ROLE;
-grant CREATE APPLICATION PACKAGE on account to role ATTENDEE_ROLE;
-grant CREATE APPLICATION on account to role ATTENDEE_ROLE;
-grant IMPORT SHARE on account to role ATTENDEE_ROLE;
-
-
-
-use role ATTENDEE_ROLE;
-
-
-USE ROLE ACCOUNTADMIN;
-
-grant create warehouse on account to role ATTENDEE_ROLE;
-grant create database on account to role ATTENDEE_ROLE;
-grant create integration on account to role ATTENDEE_ROLE;
-
--- Ensure database and schema exist and are owned by ATTENDEE_ROLE
+-- Ensure database and schema exist
 CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
 CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 
--- Grant ownership to ATTENDEE_ROLE (revoke existing grants automatically)
-GRANT OWNERSHIP ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE REVOKE CURRENT GRANTS;
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO ROLE ATTENDEE_ROLE;
-
-use role ATTENDEE_ROLE;
+-- Continue with ACCOUNTADMIN for all operations
+USE ROLE ACCOUNTADMIN;
 
 create or replace warehouse LARGE_WH with warehouse_size='large';
 
 -- snowflake_intelligence database and schema already created in 01_configure_account.sql
--- Grant already provided to ATTENDEE_ROLE
+-- Using ACCOUNTADMIN for all operations
 
 use database ACCELERATE_AI_IN_FSI;
 use schema DEFAULT_SCHEMA;
