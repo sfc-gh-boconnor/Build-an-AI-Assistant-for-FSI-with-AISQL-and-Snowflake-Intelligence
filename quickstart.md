@@ -227,9 +227,9 @@ SELECT 'Git integration ready!' AS status,
 Now will create a workspace from the github repository
 
 1. Create a Workspace from Github repository
-   ![1764683735634](image/quickstart/1764683735634.png)
+   ![Create Workspace from GitHub](assets/images/general/create_workspace_github.png)
 2. When Prompted, populate the following screen
-![1764683845282](image/quickstart/1764683845282.png)
+![Git Repository URL](assets/images/general/git_repository_url.png)
 Use the following URL in the Repository URL field:
 
 https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
