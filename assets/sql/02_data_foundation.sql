@@ -385,23 +385,24 @@ def send_email(session: snowpark.Session, email_subject: str, email_content: str
     
     try:
         # Store email in EMAIL_PREVIEWS table for SnowMail viewer
-        current_timestamp = session.sql("SELECT CURRENT_TIMESTAMP()").collect()[0][0]
-        
-        insert_query = f"""
+        # Use parameterized query to avoid SQL injection and dollar-quote conflicts
+        insert_query = """
         INSERT INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS 
         (EMAIL_ID, RECIPIENT_EMAIL, SUBJECT, HTML_CONTENT, CREATED_AT)
-        VALUES ('{email_id}', '{recipient_email}', '{email_subject.replace("'", "''")}', 
-                $$${html_content}$$$, '{current_timestamp}')
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP())
         """
-        session.sql(insert_query).collect()
+        session.sql(insert_query, params=[email_id, recipient_email, email_subject, html_content]).collect()
         
         # Send email using SYSTEM$SEND_EMAIL
+        # Escape single quotes in content for SQL string
+        escaped_subject = email_subject.replace("'", "''")
+        escaped_content = html_content.replace("'", "''")
         query = f"""
         CALL SYSTEM$SEND_EMAIL(
             'snowflake_intelligence_email_int',
             '{recipient_email}',
-            '{email_subject.replace("'", "''")}',
-            $$${html_content}$$$,
+            '{escaped_subject}',
+            '{escaped_content}',
             '{mime_type}'
         )
         """
