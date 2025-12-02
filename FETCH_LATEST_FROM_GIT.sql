@@ -8,14 +8,18 @@
 USE ROLE ACCOUNTADMIN;
 
 -- Fetch the latest changes from GitHub
-ALTER GIT REPOSITORY ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
+ALTER GIT REPOSITORY SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO FETCH;
 
 -- Verify the fetch was successful
-SHOW GIT BRANCHES IN ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
+SHOW GIT BRANCHES IN SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO;
 
--- List files to confirm notebook 5 is present
-LIST @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/;
+-- List SQL scripts to confirm latest version
+LIST @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/sql/;
 
-SELECT 'Git repository refreshed successfully!' AS status,
-       'You can now run script 05 to copy Notebook 5' AS next_step;
+-- List notebooks to confirm they're present
+LIST @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Notebooks/;
+
+SELECT '✅ Git repository refreshed successfully!' AS status,
+       'Latest code from GitHub is now available' AS result,
+       'Run EXECUTE IMMEDIATE scripts to deploy updates' AS next_step;
 
