@@ -999,12 +999,12 @@ The playground shows the generated SQL and results.
 **Next**: These semantic views become tools for the Snowflake Intelligence Agent, enabling it to answer complex questions about financial data!
 
 <!-- ------------------------ -->
-## Use Snowflake Intelligence Agent
-Duration: 20
+## Test Cortex Search Services
+Duration: 10
 
-### Overview: The One Ticker Stock Agent
+### Use the Cortex Search Playground
 
-Use the Cortex Search Playground:
+Test the search services you created:
 
 1. Navigate to **AI & ML Studio** → **Cortex Search**
 2. Select **EMAILS** service
