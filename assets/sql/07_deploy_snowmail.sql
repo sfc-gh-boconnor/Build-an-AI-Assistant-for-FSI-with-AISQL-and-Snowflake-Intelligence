@@ -98,34 +98,21 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
 -- ========================================
--- Step 5: Grant Consumer Data Access to Application
+-- Step 5: Bind References to Consumer Objects
 -- ========================================
 
--- Native Apps access consumer data through grants
--- Permission model varies by Snowflake version
+-- Native Apps use REFERENCES to access consumer data
+-- The setup.sql declares what it needs, we bind it here
 
 USE ROLE ACCOUNTADMIN;
 
--- Set context
-USE DATABASE ACCELERATE_AI_IN_FSI;
-USE SCHEMA DEFAULT_SCHEMA;
+-- Bind the EMAIL_PREVIEWS table reference
+-- This tells the app which actual table to use for the reference
+ALTER APPLICATION SNOWMAIL
+  SET REFERENCE 'EMAIL_PREVIEWS_TABLE' = ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
--- Attempt to grant to APPLICATION (works in some Snowflake versions)
--- If this fails, you'll need to grant via the Snowflake UI:
--- Apps → SNOWMAIL → Security → Grant access to database/schema/table/warehouse
-
-BEGIN
-    GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
-    GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
-    GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
-    GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
-EXCEPTION
-    WHEN OTHER THEN
-        -- Grants failed - user needs to grant via UI
-        SELECT 'ℹ️  IMPORTANT: Grant permissions to SnowMail via Snowflake UI' AS notice,
-               'Navigate to: Apps → SNOWMAIL → Security → Manage Access' AS instructions,
-               'Grant: USAGE on database/schema, SELECT/DELETE on EMAIL_PREVIEWS, USAGE on warehouse' AS permissions;
-END;
+-- Grant usage on the warehouse for Streamlit execution
+GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 
 -- ========================================
 -- Deployment Complete

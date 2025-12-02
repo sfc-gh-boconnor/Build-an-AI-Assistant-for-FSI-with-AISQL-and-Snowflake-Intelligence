@@ -164,7 +164,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Query emails from table (granted during deployment)
+# Query emails from view (references consumer table)
 try:
     emails_query = """
     SELECT 
@@ -173,7 +173,7 @@ try:
         SUBJECT,
         CREATED_AT,
         LENGTH(HTML_CONTENT) as HTML_SIZE
-    FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS
+    FROM app_schema.email_data
     ORDER BY CREATED_AT DESC
     LIMIT 500
     """
@@ -286,7 +286,7 @@ try:
                         emails_to_delete = list(st.session_state['selected_email_ids'])
                         email_ids_str = "', '".join(emails_to_delete)
                         delete_query = f"""
-                        DELETE FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS
+                        DELETE FROM app_schema.email_data
                         WHERE EMAIL_ID IN ('{email_ids_str}')
                         """
                         session.sql(delete_query).collect()
@@ -407,7 +407,7 @@ try:
                             # Create IN clause for SQL
                             email_ids_str = "', '".join(emails_to_delete)
                             delete_query = f"""
-                            DELETE FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS
+                            DELETE FROM app_schema.email_data
                             WHERE EMAIL_ID IN ('{email_ids_str}')
                             """
                             session.sql(delete_query).collect()
@@ -430,7 +430,7 @@ try:
                 # Fetch HTML content
                 html_query = f"""
                 SELECT HTML_CONTENT
-                FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS
+                FROM app_schema.email_data
                 WHERE EMAIL_ID = '{st.session_state['selected_email_id']}'
                 """
                 html_result = session.sql(html_query).collect()
