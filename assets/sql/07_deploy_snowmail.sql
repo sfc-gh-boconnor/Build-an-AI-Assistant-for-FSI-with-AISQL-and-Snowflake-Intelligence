@@ -82,6 +82,9 @@ CREATE APPLICATION SNOWMAIL
 
 -- Ensure EMAIL_PREVIEWS table exists (should be created in script 02)
 -- If script 02 hasn't been run, create a minimal version for SnowMail to work
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA DEFAULT_SCHEMA;
+
 CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
     EMAIL_ID VARCHAR(100) PRIMARY KEY,
     RECIPIENT_EMAIL VARCHAR(500),
@@ -94,7 +97,7 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 )
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
--- Grant database and schema access
+-- Grant database and schema access to the application
 GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
 GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
 
@@ -106,6 +109,13 @@ GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS
 
 -- Grant warehouse access for Streamlit execution
 GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
+
+-- ========================================
+-- Step 6: Grant Access to ATTENDEE_ROLE
+-- ========================================
+
+-- Allow ATTENDEE_ROLE to use the SnowMail application
+GRANT USAGE ON APPLICATION SNOWMAIL TO ROLE ATTENDEE_ROLE;
 
 -- ========================================
 -- Deployment Complete
