@@ -1193,152 +1193,139 @@ The One Ticker agent has access to **10 different tools** that it automatically 
 
 ---
 
-### Guided Tutorial: Sample Conversation Flow
+### What the Agent Can Do
 
-Follow these questions **in order** to experience the full power of the agent:
+#### 1. Stock Performance Predictions
 
-#### Question 1: Stock Performance Predictions
-
-**Ask:**
+**Try asking:**
 > "Give me top 3 vs bottom 3 trade predictions for the next period."
 
-**What Happens:**
-- Agent uses the **STOCK_PERFORMANCE_PREDICTOR** tool
-- Runs ML model on technical indicators (r_1, r_5_1, r_10_5, r_21_10, r_63_21)
-- Ranks stocks by predicted performance
-- Shows chart with top 3 winners and bottom 3 underperformers
+The agent will:
+- Use machine learning models to analyze technical indicators
+- Rank stocks by predicted performance
+- Show you the top 3 expected winners and bottom 3 underperformers
+- Display results in a visual chart
 
-**Expected Output**: Visual chart showing predicted performers
+**Behind the scenes:** Uses the `STOCK_PERFORMANCE_PREDICTOR` function with gradient boosting models trained on historical price data (r_1, r_5_1, r_10_5, r_21_10, r_63_21 momentum ratios).
 
----
+#### 2. Sentiment Analysis
 
-#### Question 2: Sentiment Analysis of Bottom Performers
-
-**Ask:**
+**Try asking:**
 > "Let's observe if any high sentiment in the bottom 3 performers, and summarize the qualitative insights from the earnings call that shows top sentiment."
 
-**What Happens:**
-- Agent identifies bottom performing companies from previous answer
-- Uses **Sentiment_Analysis** search service
-- Analyzes earnings call transcripts for sentiment
-- Extracts positive insights from analyst discussions
+The agent will:
+- Identify bottom performing companies
+- Analyze earnings call transcripts for sentiment
+- Extract positive insights from analyst discussions
+- Summarize key qualitative findings
 
-**Data Sources**: 92 earnings call transcripts from 11 companies
+**Data sources:** Searches across 92 earnings call transcripts from 11 companies with AI-extracted sentiment scores.
 
-![Agent Response Example](assets/images/agent/agent_response.png)
+#### 3. Company Material Review
 
----
-
-#### Question 3: Company Material Review
-
-**Ask:**
+**Try asking:**
 > "What have these bottom 3 performers published themselves in terms of reports?"
 
-**What Happens:**
-- Agent uses **Latest_infographics_8_core_stocks** search
-- Searches financial reports and earnings materials
-- Compares to top performers' comprehensive disclosures
-- Explains the limited IR approach of smaller companies
+The agent will:
+- Search infographics, financial reports, and earnings materials
+- Show what investor relations materials exist
+- Compare to top performers' comprehensive disclosures
+- Explain the limited IR approach of smaller companies
 
-**Demonstrates**: PROP, GAME, and MKTG have minimal published materials (realistic for growth-stage companies)
+**Demonstrates:** PROP, GAME, and MKTG have minimal published materials (realistic for growth-stage companies).
 
----
+#### 4. Stock Price Trend Visualization
 
-#### Question 4: Analyst Opinions
+**Try asking:**
+> "Now I would like to see a trend visualising the SNOW stock performance over time"
 
-**Ask:**
-> "What about the top 3 performers? What do we have here?"
+The agent will:
+- Query the STOCK_PRICES table (6,420+ data points)
+- Filter to Snowflake (SNOW ticker) using TICKER_SNOW filter
+- Create time-series visualizations
+- Show high, low, volume, and closing prices over time
 
-**What Happens:**
-- Agent searches across multiple sources
-- Uses **Email_Content** and **Analyst_Reports_Snowflake**
-- Summarizes analyst consensus
-- Shows rating distribution
+**Data coverage:** Historical stock prices from 2020-present with daily granularity.
 
-**Research Firms**: Apex Analytics, Sterling Partners, Veridian Capital, Pinnacle Growth Investors, Momentum Metrics, Quant-Vestor
+#### 5. Analyst Opinion Research
 
----
+**Try asking:**
+> "What do the other analysts say about snowflake?"
 
-#### Question 5: C-Level Sentiment Analysis
+The agent will:
+- Search 30 analyst reports across 6 research firms
+- Search 950+ analyst emails
+- Summarize consensus opinions
+- Show rating distribution (BUY, HOLD, SELL, etc.)
 
-**Ask:**
-> "Great, now can we focus on Snowflake - are there any C level people at Snowflake that are negative on earnings calls?"
+**Research firms covered:** Apex Analytics, Sterling Partners, Veridian Capital, Pinnacle Growth Investors, Momentum Metrics, Quant-Vestor.
 
-**What Happens:**
-- Agent uses **snowflake_full_earnings_calls** search
-- Analyzes transcripts by speaker
-- Filters for C-level executives
-- Shows sentiment scores by speaker
+#### 6. Narrative Analysis with Web Fact-Checking
 
-**Data Coverage**: 3 quarters of Snowflake earnings calls
+**Try asking:**
+> "I would like to see what happened to neuro nector and how did this impact Snowflake. Present the information based on what we have - then fact check with any available data from the web."
 
----
+The agent will:
+- Review internal data about Neuro-Nectar (NRNT)
+- Show the bankruptcy timeline (July-Nov 2024)
+- Analyze impact on Snowflake stock
+- Use WEB_SEARCH to fact-check details
+- Cross-reference with external sources
 
-#### Question 6: Stock Price Visualization
+**Demonstrates:** How AI agents can combine internal data with external web searches for comprehensive analysis.
 
-**Ask:**
-> "Now I would like to see a trend visualizing the SNOW stock performance over time"
+#### 7. Email Report Generation
 
-**What Happens:**
-- Agent uses **snowflake_data** semantic view
-- Queries `STOCK_PRICES` table (6,420 Snowflake data points)
-- Uses `TICKER_SNOW` named filter
-- Creates time-series visualization
+**Try asking:**
+> "Finally send me an email of your findings - as i really want to put neuro nector drama to bed!!!"
 
-**Visual Output**: Line chart showing high, low, volume, and closing prices over time (2020-present)
+The agent will:
+- Summarize all previous analysis
+- Format as professional email with markdown
+- Save to EMAIL_PREVIEWS table
+- Return SnowMail URL for viewing
 
----
-
-#### Question 7: External Analyst Research
-
-**Ask:**
-> "What do the other analysts say about Snowflake?"
-
-**What Happens:**
-- Agent searches 30 analyst reports across 6 research firms
-- Searches 950+ analyst emails
-- Uses **Analyst_Reports_Snowflake** and **Email_Content**
-- Summarizes consensus opinions and rating distribution
-
-**Rating Types**: BUY, SELL, HOLD, OVERWEIGHT, EQUAL-WEIGHT, UNDERWEIGHT, OUTPERFORM
-
----
-
-#### Question 8: Narrative Analysis with Web Fact-Checking
-
-**Ask:**
-> "I would like to see what happened to Neuro-Nectar and how did this impact Snowflake. Present the information based on what we have - then fact check with any available data from the web."
-
-**What Happens:**
-- Agent reviews internal data about Neuro-Nectar (NRNT)
-- Shows bankruptcy timeline (July-Nov 2024)
-- Analyzes impact on Snowflake stock
-- Uses **WEB_SEARCH** to fact-check details
-- Cross-references with external sources
-
-**Demonstrates**: How AI agents combine internal data with external web searches for comprehensive analysis
-
----
-
-#### Question 9: Email Report Generation
-
-**Ask:**
-> "Finally send me an email of your findings - as I really want to put Neuro-Nectar drama to bed!!!"
-
-**What Happens:**
-- Agent summarizes all previous analysis
-- Formats as professional email with markdown
-- Uses **SEND_EMAIL** tool
-- Saves to `EMAIL_PREVIEWS` table
-- Returns SnowMail URL for viewing
-
-**Email Features**:
-- Markdown automatically converted to HTML
+**Email features:**
+- Markdown converted to HTML automatically
 - Snowflake brand styling applied
 - Viewable in Gmail-style SnowMail interface
 - Includes all charts and findings
 
 **IMPORTANT**: After calling SEND_EMAIL, the agent will display a **clickable URL** - right-click or CMD+Click to open the email in SnowMail!
+
+---
+
+### Sample Conversation Flow
+
+Here's an example conversation demonstrating the agent's capabilities:
+
+**You:** "Give me top 3 vs bottom 3 trade predictions for the next period."
+
+**Agent:** *Runs ML model, shows chart with top performers (e.g., VLTA, QRYQ, ICBG) and bottom performers (e.g., PROP, GAME, MKTG)*
+
+**You:** "What have these bottom 3 performers published themselves in terms of reports?"
+
+**Agent:** *Searches infographics and reports, explains PROP/GAME/MKTG have limited investor materials compared to core 8 companies*
+
+**You:** "Now can we focus on snowflake - are there any c level people at snowflake that are negative on earnings calls?"
+
+**Agent:** *Analyzes earnings transcripts by speaker, shows C-level sentiment scores*
+
+**You:** "I would like to see a trend visualising the SNOW stock performance over time"
+
+**Agent:** *Queries STOCK_PRICES with TICKER_SNOW filter, creates time-series chart showing price trends*
+
+**You:** "What do the other analysts say about snowflake?"
+
+**Agent:** *Searches analyst reports and emails, summarizes ratings distribution, shows consensus*
+
+**You:** "I would like to see what happened to neuro nector and how did this impact Snowflake. Present the information based on what we have - then fact check with any available data from the web."
+
+**Agent:** *Reviews NRNT bankruptcy timeline from internal data, searches web for external verification, shows SNOW recovery pattern*
+
+**You:** "Finally send me an email of your findings - as i really want to put neuro nector drama to bed!!!"
+
+**Agent:** *Generates comprehensive email summary, returns SnowMail URL for viewing*
 
 ---
 
