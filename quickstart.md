@@ -89,7 +89,7 @@ This quickstart deploys a **complete multi-modal AI platform** combining:
 
 ### System Architecture
 
-![System Architecture](assets/images/general/architecture.png)
+![System Architecture](assets/images/general/lab_intro.png)
 
 ### Key Technologies
 
