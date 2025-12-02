@@ -193,8 +193,7 @@ CREATE OR REPLACE SEMANTIC VIEW ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.COMPANY_DATA
 	)
 	DIMENSIONS (
 		INFOGRAPHICS_FOR_SEARCH.BRANDING AS BRANDING 
-			COMMENT='CatalogX provides the unified governance layer for the modern data stack, making data governance no longer optional but systematically manageable across heterogeneous environments.' 
-			WITH CORTEX SEARCH SERVICE DEFAULT_SCHEMA.INFOGRAPHICS_SEARCH,
+			COMMENT='CatalogX provides the unified governance layer for the modern data stack, making data governance no longer optional but systematically manageable across heterogeneous environments.',
 		INFOGRAPHICS_FOR_SEARCH.COMPANY_NAME AS COMPANY_NAME 
 			COMMENT='The name of the company that created the infographic.',
 		INFOGRAPHICS_FOR_SEARCH.COMPANY_TICKER AS COMPANY_TICKER 
@@ -222,8 +221,7 @@ CREATE OR REPLACE SEMANTIC VIEW ACCELERATE_AI_IN_FSI.CORTEX_ANALYST.COMPANY_DATA
 		INFOGRAPHICS_FOR_SEARCH.SERVICES_REVENUE AS SERVICES_REVENUE 
 			COMMENT='The total revenue generated from services provided by the company.',
 		INFOGRAPHICS_FOR_SEARCH.TEXT AS TEXT 
-			COMMENT='DataFlex Analytics is a data-source-agnostic business intelligence and visualization platform that operates as the Switzerland of the BI ecosystem. Our mission is to help organizations extract actionable insights from wherever their data lives, without forcing them into proprietary storage solutions.' 
-			WITH CORTEX SEARCH SERVICE DEFAULT_SCHEMA.INFOGRAPHICS_SEARCH,
+			COMMENT='DataFlex Analytics is a data-source-agnostic business intelligence and visualization platform that operates as the Switzerland of the BI ecosystem. Our mission is to help organizations extract actionable insights from wherever their data lives, without forcing them into proprietary storage solutions.',
 		INFOGRAPHICS_FOR_SEARCH.TICKER AS TICKER 
 			COMMENT='Stock ticker symbol of a publicly traded company.',
 		INFOGRAPHICS_FOR_SEARCH.TOTAL_CUSTOMERS AS TOTAL_CUSTOMERS 
