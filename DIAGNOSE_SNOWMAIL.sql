@@ -31,22 +31,34 @@ SELECT 'EMAIL_PREVIEWS row count:' AS info, COUNT(*) AS rows
 FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
 -- ========================================
--- STEP 4: Check ATTENDEE_ROLE Permissions
+-- STEP 4: Check Application Role Permissions
 -- ========================================
-SELECT '====== STEP 4: ATTENDEE_ROLE Permissions ======' AS step;
+SELECT '====== STEP 4: Application Role Permissions ======' AS step;
 
--- SnowMail Streamlit uses get_active_session(), so it runs with the user's privileges
--- Check if ATTENDEE_ROLE has the required permissions
+-- Native Apps access consumer data through APPLICATION ROLE grants
+-- Check if app_public role has the required permissions
 
-SHOW GRANTS TO ROLE ATTENDEE_ROLE;
+SHOW GRANTS TO APPLICATION ROLE SNOWMAIL.app_public;
 
--- Check specifically for EMAIL_PREVIEWS access
+-- Check specifically for consumer database access
 SELECT 
     CASE 
-        WHEN SUM(CASE WHEN "privilege" IN ('SELECT', 'INSERT', 'DELETE') AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) >= 3 THEN '✅ ATTENDEE_ROLE has SELECT, INSERT, DELETE on EMAIL_PREVIEWS'
-        ELSE '❌ ATTENDEE_ROLE missing permissions on EMAIL_PREVIEWS'
-    END AS table_permissions
-FROM (SHOW GRANTS TO ROLE ATTENDEE_ROLE);
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'DATABASE' AND "name" = 'ACCELERATE_AI_IN_FSI' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS database_usage,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'SCHEMA' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS schema_usage,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" IN ('SELECT', 'DELETE') AND "granted_on" = 'TABLE' AND "name" = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' THEN 1 ELSE 0 END) >= 2 THEN '✅'
+        ELSE '❌'
+    END AS table_permissions,
+    CASE 
+        WHEN SUM(CASE WHEN "privilege" = 'USAGE' AND "granted_on" = 'WAREHOUSE' AND "name" = 'DEFAULT_WH' THEN 1 ELSE 0 END) > 0 THEN '✅'
+        ELSE '❌'
+    END AS warehouse_usage
+FROM (SHOW GRANTS TO APPLICATION ROLE SNOWMAIL.app_public);
 
 -- ========================================
 -- STEP 5: Test query as the application would see it
@@ -68,17 +80,18 @@ LIMIT 5;
 SELECT '====== Recommended Fixes ======' AS step;
 
 SELECT 
-'If permissions are missing (❌), run the fix script:
+'If any permissions are missing (❌), run the fix script:
 
 EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/FIX_SNOWMAIL_PERMISSIONS.sql;
 
-Or grant missing permissions manually:
-  GRANT SELECT, INSERT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO ROLE ATTENDEE_ROLE;
+Or grant missing permissions manually to the APPLICATION ROLE:
+  GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
+  GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SNOWMAIL.app_public;
+  GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
+  GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
 
-Note: SnowMail Streamlit uses get_active_session(), which runs with the user''s 
-privileges (ATTENDEE_ROLE), not the application''s privileges.
-
-Application access is managed automatically through the Native Apps UI.
+Note: Native Apps access consumer data through APPLICATION ROLE grants.
+The app_public role is defined in the app''s setup.sql.
 
 After running the fix, refresh the SnowMail app in your browser.
 ' AS instructions;

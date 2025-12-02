@@ -98,16 +98,26 @@ CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
 COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTIFICATION procedure';
 
 -- ========================================
--- Step 5: Application Access
+-- Step 5: Grant Consumer Data Access to Application
 -- ========================================
 
--- The Streamlit app runs with the user's session (get_active_session)
--- so it uses the user's privileges, not the application's privileges.
--- ATTENDEE_ROLE already has SELECT, INSERT on EMAIL_PREVIEWS from script 02.
+-- Native Apps access consumer data through APPLICATION ROLE grants
+-- The setup.sql creates app_public application role
+-- We need to grant the consumer's tables to this application role
 
--- Note: Application access is managed automatically in Native Apps
--- Users can access the app through the Native Apps UI once it's deployed
--- No explicit GRANT ON APPLICATION needed
+-- Set context
+USE DATABASE ACCELERATE_AI_IN_FSI;
+USE SCHEMA DEFAULT_SCHEMA;
+
+-- Grant database and schema access to the application role
+GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
+GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SNOWMAIL.app_public;
+
+-- Grant table access to the application role
+GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
+
+-- Grant warehouse for Streamlit execution
+GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
 
 -- ========================================
 -- Deployment Complete
