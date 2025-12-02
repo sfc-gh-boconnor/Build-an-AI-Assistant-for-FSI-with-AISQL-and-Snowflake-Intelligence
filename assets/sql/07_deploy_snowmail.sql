@@ -103,19 +103,24 @@ COMMENT = 'Email previews for SnowMail Native App - populated by SEND_EMAIL_NOTI
 
 -- Native Apps access consumer data through APPLICATION ROLE grants
 -- The setup.sql creates app_public application role
--- We need to grant the consumer's tables to this application role
 
--- Must use ACCOUNTADMIN to grant to application roles
+-- Must use ACCOUNTADMIN for all application-related operations
 USE ROLE ACCOUNTADMIN;
 
 -- Set context
 USE DATABASE ACCELERATE_AI_IN_FSI;
 USE SCHEMA DEFAULT_SCHEMA;
 
--- Temporarily take ownership to grant to application role
--- (ACCOUNTADMIN needs ownership to grant to APPLICATION ROLE)
-GRANT OWNERSHIP ON DATABASE ACCELERATE_AI_IN_FSI TO ROLE ACCOUNTADMIN COPY CURRENT GRANTS;
-GRANT OWNERSHIP ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ACCOUNTADMIN COPY CURRENT GRANTS;
+-- For Native Apps, we need to grant from the database/schema owner
+-- Since ATTENDEE_ROLE owns these objects, we need to grant as that role
+-- OR give ACCOUNTADMIN the MANAGE GRANTS privilege
+
+-- Alternative approach: Use ATTENDEE_ROLE to grant, since it owns the database
+-- But first grant ATTENDEE_ROLE the ability to grant to application roles
+GRANT MANAGE GRANTS ON ACCOUNT TO ROLE ATTENDEE_ROLE;
+
+-- Now switch to ATTENDEE_ROLE to grant (as the owner)
+USE ROLE ATTENDEE_ROLE;
 
 -- Grant database and schema access to the application role
 GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
@@ -124,12 +129,9 @@ GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SN
 -- Grant table access to the application role
 GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
 
--- Grant warehouse for Streamlit execution
+-- Switch back to ACCOUNTADMIN for warehouse grant
+USE ROLE ACCOUNTADMIN;
 GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
-
--- Return ownership to ATTENDEE_ROLE
-GRANT OWNERSHIP ON DATABASE ACCELERATE_AI_IN_FSI TO ROLE ATTENDEE_ROLE COPY CURRENT GRANTS;
-GRANT OWNERSHIP ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE COPY CURRENT GRANTS;
 
 -- ========================================
 -- Deployment Complete
