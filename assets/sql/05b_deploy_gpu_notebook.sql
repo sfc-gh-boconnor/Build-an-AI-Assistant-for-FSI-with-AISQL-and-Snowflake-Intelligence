@@ -11,7 +11,7 @@ ALTER SESSION SET QUERY_TAG = '''{"origin":"sf_sit-is", "name":"Build an AI Assi
 -- If you receive an error about GPU not being available:
 -- 1. Skip this script - the rest of the quickstart will work without it
 -- 2. OR use a different region that supports GPU
--- 3. The pre-trained ML model is already available in 08_setup_ml_infrastructure.sql
+-- 3. The pre-trained ML model is already available in 08_custom_agent_tools.sql
 --
 -- To check GPU availability in your region, contact Snowflake support or
 -- check: https://docs.snowflake.com/en/user-guide/ui-snowsight-notebooks-compute-pool
@@ -86,7 +86,7 @@ SELECT 'GPU notebook deployed successfully!' AS status,
 -- ❌ If this script failed with GPU_NV_S error:
 --    - GPU is not available in your region
 --    - You still have 3 working notebooks (1, 2, 4, 5)
---    - Pre-trained ML model is available in 08_setup_ml_infrastructure.sql
+--    - Pre-trained ML model is available in 08_custom_agent_tools.sql
 --    - The agent can still make predictions using the pre-trained model
 --
 -- Continue with: 06_deploy_documentai.sql
