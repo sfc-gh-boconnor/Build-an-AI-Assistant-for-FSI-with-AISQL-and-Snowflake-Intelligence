@@ -1825,34 +1825,52 @@ Navigate to **Native Apps** → **SnowMail**
 
 **Troubleshooting SnowMail**:
 
-If you see "Database does not exist or not authorized", you need to grant permissions to the application through the Snowflake UI:
+If you see "Database does not exist or not authorized", you need to grant permissions to the application:
 
-**Grant Permissions via UI:**
-1. Navigate to **Apps** → **Installed Apps** (or **Native Apps**)
-2. Find and click **SNOWMAIL**
-3. Click **Security** or **Manage Access**
-4. Grant the following:
-   - Database: `ACCELERATE_AI_IN_FSI` (USAGE)
-   - Schema: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA` (USAGE)
-   - Table: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS` (SELECT, DELETE)
-   - Warehouse: `DEFAULT_WH` (USAGE)
-5. Save/Apply the grants
+**Method 1: Grant via Snowflake UI (Recommended)**
 
-**Alternative - SQL Method (if supported):**
+1. Navigate to **Apps** → **Installed Apps** (or **Apps** → **Native Apps**)
+2. Find and click the **SNOWMAIL** application
+3. Look for the **Security**, **Privileges**, or **Manage Access** section
+4. Click **Grant** or **Add Privileges**
+5. Grant the following permissions:
 
-If your Snowflake version supports SQL grants to applications:
+   **Database Access:**
+   - Object Type: **Database**
+   - Database: `ACCELERATE_AI_IN_FSI`
+   - Privilege: **USAGE**
+   
+   **Schema Access:**
+   - Object Type: **Schema**
+   - Schema: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA`
+   - Privilege: **USAGE**
+   
+   **Table Access:**
+   - Object Type: **Table**
+   - Table: `ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS`
+   - Privileges: **SELECT** and **DELETE**
+   
+   **Warehouse Access:**
+   - Object Type: **Warehouse**
+   - Warehouse: `DEFAULT_WH`
+   - Privilege: **USAGE**
+
+6. Click **Grant** or **Save** for each permission
+7. Refresh the SnowMail app
+
+**Method 2: SQL Method (if your version supports it)**
 
 ```sql
 USE ROLE ACCOUNTADMIN;
 
--- Try granting TO APPLICATION (older syntax)
+-- Try granting TO APPLICATION
 GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION SNOWMAIL;
 GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION SNOWMAIL;
 GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION SNOWMAIL;
 GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION SNOWMAIL;
 ```
 
-**Why this works**: Native App permission models vary by Snowflake version. The UI method works across all versions.
+If SQL grants fail with "insufficient privileges" or "not supported", use Method 1 (UI).
 
 For detailed diagnostics, run:
 ```sql
