@@ -794,6 +794,20 @@ Duration: 15
 - 📈 **Verified Queries** - Save and reuse successful queries
 - 🎯 **Named Filters** - Predefined filters like "TICKER_SNOW"
 
+### Prerequisites: Get Marketplace Data
+
+Before running Notebook 5, you need to get the **Snowflake Public Data (Paid)** dataset from the Snowflake Marketplace:
+
+1. Click on **Data Products** → **Marketplace** in the left navigation
+2. Search for **"Snowflake Public Data"**
+3. Find the listing from **Snowflake Public Data Products** (has 60-day unlimited trial)
+4. Click on the listing and then click **Get**
+5. Accept the terms and the data will be available as a shared database
+
+![Snowflake Public Data Marketplace Listing](assets/images/marketplace/snowflake_public_data.png)
+
+> **💡 Tip**: This dataset includes 90+ sources of public domain data including stock prices that the notebook uses for visualization and analysis. The 60-day trial is free.
+
 ### Open Notebook 5
 
 Navigate to **AI & ML Studio** → **Notebooks** → **5_CORTEX_ANALYST**
