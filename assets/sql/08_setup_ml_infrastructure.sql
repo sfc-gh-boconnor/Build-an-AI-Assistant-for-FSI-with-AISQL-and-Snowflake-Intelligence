@@ -22,16 +22,21 @@ use role ATTENDEE_ROLE;
 
 USE ROLE ACCOUNTADMIN;
 
-
-
-
 grant create warehouse on account to role ATTENDEE_ROLE;
 grant create database on account to role ATTENDEE_ROLE;
 grant create integration on account to role ATTENDEE_ROLE;
 
+-- Ensure database and schema exist and are owned by ATTENDEE_ROLE
+CREATE DATABASE IF NOT EXISTS ACCELERATE_AI_IN_FSI;
+CREATE SCHEMA IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
+
+-- Grant ownership to ATTENDEE_ROLE so they can create objects
+GRANT OWNERSHIP ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
+GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO ROLE ATTENDEE_ROLE;
+GRANT ALL PRIVILEGES ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO ROLE ATTENDEE_ROLE;
+
 use role ATTENDEE_ROLE;
 
-create schema if not exists ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 create or replace warehouse LARGE_WH with warehouse_size='large';
 
 -- snowflake_intelligence database and schema already created in 01_configure_account.sql
