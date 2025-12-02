@@ -34,7 +34,9 @@ FILES = ('analyst_sentiments.yaml');
 
 alter stage semantic_models refresh;
 
-create or replace table ai_transcripts_analysts_sentiments (
+-- ai_transcripts_analysts_sentiments is created and loaded in script 02
+-- CREATE TABLE IF NOT EXISTS to avoid overwriting existing data
+CREATE TABLE IF NOT EXISTS ai_transcripts_analysts_sentiments (
     primary_ticker VARCHAR(16777216),
     event_timestamp TIMESTAMP_NTZ(9),
     event_type VARCHAR(16777216),
@@ -95,41 +97,18 @@ create or replace table ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.fsi_data (
     realized_tplus2_x5 FLOAT
 );
 
--- Create table for AI transcripts analyst sentiments
-create or replace table ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ai_transcripts_analysts_sentiments (
-    primary_ticker VARCHAR(10),
-    event_timestamp TIMESTAMP_NTZ(9),
-    event_type VARCHAR(50),
-    created_at TIMESTAMP_NTZ(9),
-    sentiment_score INTEGER,
-    unique_analyst_count INTEGER,
-    sentiment_reason TEXT
-);
+-- Tables ai_transcripts_analysts_sentiments and unique_transcripts are already created in script 02
+-- Skip table creation here to avoid overwriting data
 
--- Create table for unique transcripts (matching reference structure from swt-london-2026-keynote-demo)
-create or replace table ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts (
-    primary_ticker VARCHAR(16777216),
-    event_timestamp TIMESTAMP_NTZ(9),
-    event_type VARCHAR(16777216),
-    created_at TIMESTAMP_NTZ(9),
-    transcript VARIANT
-);
-
--- Load data from stage to tables
+-- Data loading is handled by script 02_data_foundation.sql
+-- fsi_data is only needed for ML and loaded here
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.fsi_data
 FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE/fsi_data.csv
 FILE_FORMAT = (FORMAT_NAME = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_FORMAT')
 ON_ERROR = 'CONTINUE';
 
-COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.ai_transcripts_analysts_sentiments
-FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE/ai_transcripts_analysts_sentiments.csv
-FILE_FORMAT = (FORMAT_NAME = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_FORMAT')
-ON_ERROR = 'CONTINUE';
-
-COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts
-FROM @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_DATA_STAGE/unique_transcripts.csv
-FILE_FORMAT = (FORMAT_NAME = 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.CSV_FORMAT')
-ON_ERROR = 'CONTINUE';
+-- ai_transcripts_analysts_sentiments and unique_transcripts are already loaded in script 02
+-- Skipping COPY INTO to avoid duplicate data
 
 
 
