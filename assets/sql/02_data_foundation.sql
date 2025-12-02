@@ -477,12 +477,36 @@ UNION ALL
 SELECT 'SOCIAL_MEDIA_NRNT', COUNT(*) FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SOCIAL_MEDIA_NRNT;
 
 -- =====================================================
--- WEB_SEARCH Function (External Access)
+-- WEB_SEARCH Function (External Access) - OPTIONAL
 -- =====================================================
--- Moved to end - requires SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
--- Created in script 01
+-- REQUIRES: Serper API key and external access integration
+-- To enable web search, run these commands first:
+--
+-- 1. Create a database for secrets:
+--    CREATE DATABASE IF NOT EXISTS SNOWFLAKE_INTELLIGENCE_SECRETS;
+--    CREATE SCHEMA IF NOT EXISTS SNOWFLAKE_INTELLIGENCE_SECRETS.SECRETS;
+--
+-- 2. Create the secret (replace YOUR_SERPER_API_KEY):
+--    CREATE SECRET SNOWFLAKE_INTELLIGENCE_SECRETS.SECRETS.SNOWFLAKE_INTELLIGENCE_API_KEY
+--        TYPE = GENERIC_STRING
+--        SECRET_STRING = 'YOUR_SERPER_API_KEY';
+--
+-- 3. Create network rule and external access integration:
+--    CREATE OR REPLACE NETWORK RULE serper_network_rule
+--        MODE = EGRESS TYPE = HOST_PORT
+--        VALUE_LIST = ('google.serper.dev:443');
+--
+--    CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION
+--        ALLOWED_NETWORK_RULES = (serper_network_rule)
+--        ALLOWED_AUTHENTICATION_SECRETS = (SNOWFLAKE_INTELLIGENCE_SECRETS.SECRETS.SNOWFLAKE_INTELLIGENCE_API_KEY)
+--        ENABLED = TRUE;
+--
+-- 4. Then uncomment and run the WEB_SEARCH function below
 -- =====================================================
 
+-- WEB_SEARCH function commented out - requires Serper API key setup
+-- See instructions above to enable web search functionality
+/*
 CREATE OR REPLACE FUNCTION ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.WEB_SEARCH("QUERY" VARCHAR)
 RETURNS VARCHAR
 LANGUAGE PYTHON
@@ -490,7 +514,7 @@ RUNTIME_VERSION = '3.10'
 PACKAGES = ('requests','beautifulsoup4')
 HANDLER = 'search_web'
 EXTERNAL_ACCESS_INTEGRATIONS = (SNOWFLAKE_INTELLIGENCE_EXTERNALACCESS_INTEGRATION)
-SECRETS = ('snowflake_intelligence_api_key' = SNOWFLAKE_INTELLIGENCE_SECRETS.SNOWFLAKE_INTELLIGENCE_API_KEY)
+SECRETS = ('snowflake_intelligence_api_key' = SNOWFLAKE_INTELLIGENCE_SECRETS.SECRETS.SNOWFLAKE_INTELLIGENCE_API_KEY)
 AS '
 import _snowflake
 import requests
@@ -498,55 +522,28 @@ from bs4 import BeautifulSoup
 import json
 
 def search_web(query):
-    """
-    Performs a web search using Serper API and returns formatted results
-    """
     try:
-        # Get API key from secret
         api_key_object = _snowflake.get_generic_secret_string("snowflake_intelligence_api_key")
-        
-        # Serper API endpoint
         url = "https://google.serper.dev/search"
-        
-        # Request payload
-        payload = json.dumps({
-            "q": query,
-            "num": 5  # Number of results to return
-        })
-        
-        # Headers
-        headers = {
-            ''X-API-KEY'': api_key_object,
-            ''Content-Type'': ''application/json''
-        }
-        
-        # Make API request
+        payload = json.dumps({"q": query, "num": 5})
+        headers = {"X-API-KEY": api_key_object, "Content-Type": "application/json"}
         response = requests.post(url, headers=headers, data=payload, timeout=10)
         response.raise_for_status()
-        
-        # Parse results
         data = response.json()
-        
-        # Format results as text
-        results = []
-        results.append(f"Search Results for: {query}\n")
-        results.append("=" * 50 + "\n")
-        
-        # Process organic results
-        if ''organic'' in data:
-            for idx, result in enumerate(data[''organic''][:5], 1):
-                results.append(f"{idx}. {result.get(''title'', ''No title'')}")
-                results.append(f"   URL: {result.get(''link'', ''No URL'')}")
-                results.append(f"   Snippet: {result.get(''snippet'', ''No description'')}\n")
-        
+        results = [f"Search Results for: {query}\n", "=" * 50 + "\n"]
+        if "organic" in data:
+            for idx, result in enumerate(data["organic"][:5], 1):
+                results.append(f"{idx}. {result.get(\"title\", \"No title\")}")
+                results.append(f"   URL: {result.get(\"link\", \"No URL\")}")
+                results.append(f"   Snippet: {result.get(\"snippet\", \"No description\")}\n")
         return "\n".join(results)
-        
     except Exception as e:
         return f"Error performing web search: {str(e)}"
 ';
 
 GRANT USAGE ON FUNCTION ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.WEB_SEARCH(VARCHAR) TO ROLE ACCOUNTADMIN;
 GRANT USAGE ON FUNCTION ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.WEB_SEARCH(VARCHAR) TO ROLE PUBLIC;
+*/
 
 -- =====================================================
 -- DEPLOYMENT COMPLETE - RAW DATA FOUNDATION
