@@ -47,7 +47,7 @@ CREATE OR REPLACE STAGE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
 -- Copy and load email previews
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('email_previews_data.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
@@ -108,7 +108,7 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_
 -- Copy file from Git repository to stage first
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts_stage
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('unique_transcripts.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.unique_transcripts;
@@ -163,7 +163,7 @@ CREATE TEMPORARY STAGE IF NOT EXISTS stock_price_stage;
 -- Copy parquet file from Git repository to regular stage
 COPY FILES
 INTO @stock_price_stage
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('stock_price_timeseries_snow.parquet');
 
 -- Load from parquet with column name matching
@@ -203,7 +203,7 @@ CREATE OR REPLACE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALY
 -- Copy file from Git repository to regular stage first
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.data_files_stage
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('ai_transcripts_analysts_sentiments.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.AI_TRANSCRIPTS_ANALYSTS_SENTIMENTS;
@@ -261,7 +261,7 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.social_
 -- Copy file from Git repository to stage first
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.social_media_stage
-FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/quickstart/assets/data/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
 FILES = ('social_media_nrnt_collapse.csv');
 
 COPY INTO ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.SOCIAL_MEDIA_NRNT
