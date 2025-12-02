@@ -94,13 +94,13 @@ In this quickstart, you'll build a comprehensive AI-powered financial analysis p
 
 > **⚠️ Note for Trial Accounts:** The **Web Search** agent tool requires **External Access Integration**, which is not enabled by default on trial accounts. If you need this feature, contact your Snowflake representative to have it enabled. All other features (Document AI, Cortex Search, Cortex Analyst, ML predictions, email notifications) work without this.
 
-### What You'll Build
+### Assets Created
 
-By the end of this lab, you'll have:
+By the end of this lab, you'll have deployed:
 
 - **11 Companies** of synthetic financial data
 - **4,391 Social Media + News Items** (3 languages, geolocation, images)
-- **950+ Email** previews across all tickers
+- **950+ Emails** previews across all tickers
 - **850+ Financial Reports** extracted with AI
 - **22 Annual Reports** with embedded SVG charts
 - **5 Cortex Search Services** for semantic search
