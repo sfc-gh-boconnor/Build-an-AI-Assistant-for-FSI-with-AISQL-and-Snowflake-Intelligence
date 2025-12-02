@@ -10,13 +10,13 @@ CREATE STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2 DIRECT
 -------Copy streamlit 2 (sophisticated agent) files
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
 FILES = ('app.py', 'environment.yml', 'styles.css');
 
 -- Copy config.toml to .streamlit subdirectory
 COPY FILES
 INTO @ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.STREAMLIT2/.streamlit
-FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
+FROM @SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/Streamlit/2_cortex_agent_soph/
 FILES = ('config.toml');
 
 

@@ -53,7 +53,7 @@ USE DATABASE ACCELERATE_AI_IN_FSI;
 CREATE SCHEMA IF NOT EXISTS DEFAULT_SCHEMA;
 CREATE SCHEMA IF NOT EXISTS DOCUMENT_AI;
 CREATE SCHEMA IF NOT EXISTS CORTEX_ANALYST;
-CREATE SCHEMA IF NOT EXISTS GIT_REPOS;
+-- Note: GIT_REPOS is in separate SNOWFLAKE_QUICKSTART_REPOS database (created in Step 2)
 
 -- =====================================================
 -- Add descriptive comments to schemas
