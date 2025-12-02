@@ -237,12 +237,12 @@ StockOne app shows "Object not authorized" or similar errors.
 
 **Ensure role has access**:
 ```sql
-USE ROLE ATTENDEE_ROLE;
+USE ROLE ACCOUNTADMIN;
 SHOW STREAMLITS;
 -- Should see STOCKONE_AGENT
 
 -- Grant if needed
-GRANT USAGE ON STREAMLIT STOCKONE_AGENT TO ROLE ATTENDEE_ROLE;
+GRANT USAGE ON STREAMLIT STOCKONE_AGENT TO ROLE ACCOUNTADMIN;
 ```
 
 **Refresh the page**:

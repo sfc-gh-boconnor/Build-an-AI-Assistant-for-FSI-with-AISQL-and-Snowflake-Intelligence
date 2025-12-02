@@ -1,4 +1,4 @@
--- Configure Attendee Account
+-- Configure Account with ML Infrastructure
 
 -- Create the warehouse
 USE ROLE ACCOUNTADMIN;

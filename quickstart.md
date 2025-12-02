@@ -266,7 +266,7 @@ EXECUTE IMMEDIATE FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO
 
 **What gets deployed**:
 1. ✅ Database `ACCELERATE_AI_IN_FSI` with 3 schemas
-2. ✅ Role `ATTENDEE_ROLE` with CORTEX_USER privileges
+2. ✅ Role `ACCOUNTADMIN` with CORTEX_USER privileges
 3. ✅ 20+ tables with ~10,000 rows of data
 4. ✅ 2 Cortex Analyst Semantic Views
 5. ✅ 1 Snowflake Intelligence Agent
@@ -1983,15 +1983,15 @@ Duration: 5
 
 ### Security & Access Control
 
-✅ **Use ATTENDEE_ROLE for object ownership**
-- All objects created with ATTENDEE_ROLE (not ACCOUNTADMIN)
+✅ **Use ACCOUNTADMIN for object ownership**
+- All objects created with ACCOUNTADMIN (not ACCOUNTADMIN)
 - Streamlit apps run as same role
 - No complex grant chains needed
 - Owner has all privileges automatically
 
 ✅ **Grant CORTEX_USER database role**
 ```sql
-GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ATTENDEE_ROLE;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ACCOUNTADMIN;
 ```
 - Required for Cortex AI functions
 - Required for Cortex Agents REST API
@@ -2195,9 +2195,9 @@ graph TD
 ```mermaid
 graph TD
     ADMIN["ACCOUNTADMIN"]
-    ROLE["ATTENDEE_ROLE"]
+    ROLE["ACCOUNTADMIN"]
     
-    subgraph Owned["Objects Owned by ATTENDEE_ROLE"]
+    subgraph Owned["Objects Owned by ACCOUNTADMIN"]
         DB["Database<br/>ACCELERATE_AI_IN_FSI"]
         SCHEMAS["Schemas<br/>DEFAULT_SCHEMA<br/>DOCUMENT_AI<br/>CORTEX_ANALYST"]
         TABLES["Tables<br/>20+ tables"]
@@ -2209,7 +2209,7 @@ graph TD
         APPS["Applications<br/>Streamlit, SnowMail"]
     end
     
-    ACCESS["Runs as ATTENDEE_ROLE<br/>Full access (owner privileges)"]
+    ACCESS["Runs as ACCOUNTADMIN<br/>Full access (owner privileges)"]
     
     ADMIN -->|Creates| ROLE
     ROLE -->|Owns| DB
@@ -2422,7 +2422,7 @@ Before deploying to production:
   - Dates formatted correctly
 
 - [ ] **Security**
-  - ATTENDEE_ROLE properly scoped
+  - ACCOUNTADMIN properly scoped
   - CORTEX_USER role granted
   - External access limited to approved endpoints
 
@@ -2524,23 +2524,23 @@ SHOW TABLES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
 -- Look at "owner" column
 
 SHOW CORTEX SEARCH SERVICES IN ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA;
--- Check owner is ATTENDEE_ROLE
+-- Check owner is ACCOUNTADMIN
 ```
 
 **Root Causes**:
-1. ❌ Objects created with ACCOUNTADMIN (should be ATTENDEE_ROLE)
+1. ❌ Objects created with ACCOUNTADMIN (should be ACCOUNTADMIN)
 2. ❌ Missing CORTEX_USER database role
 3. ❌ Pipeline ran out of order
 
 **Solutions**:
 ```sql
--- 1. Re-create objects with ATTENDEE_ROLE
-USE ROLE ATTENDEE_ROLE;
+-- 1. Re-create objects with ACCOUNTADMIN
+USE ROLE ACCOUNTADMIN;
 -- Re-run data_foundation.template.sql
 
 -- 2. Grant CORTEX_USER
 USE ROLE ACCOUNTADMIN;
-GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ATTENDEE_ROLE;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE ACCOUNTADMIN;
 
 -- 3. Check pipeline dependencies in .yml files
 ```
@@ -2649,8 +2649,8 @@ MAIN_FILE = 'app.py'  ✅
 
 **Solution**:
 ```sql
--- Run notebooks as ATTENDEE_ROLE (owner)
-USE ROLE ATTENDEE_ROLE;
+-- Run notebooks as ACCOUNTADMIN (owner)
+USE ROLE ACCOUNTADMIN;
 
 -- Or grant access
 GRANT USAGE ON CORTEX SEARCH SERVICE service_name TO ROLE notebook_role;
