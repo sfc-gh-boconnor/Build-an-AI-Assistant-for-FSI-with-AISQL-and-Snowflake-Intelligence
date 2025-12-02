@@ -1,69 +1,74 @@
 -- ========================================
--- QUICK FIX: SnowMail Permissions
+-- SNOWMAIL PERMISSIONS SETUP
 -- ========================================
--- Run this script if SnowMail shows:
--- "Schema 'ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA' does not exist or not authorized"
+-- Use this as a reference for granting SnowMail permissions via UI
 -- ========================================
 
-USE ROLE ACCOUNTADMIN;
+-- Note: SQL-based grants to Native Applications are not supported
+-- You MUST grant permissions through the Snowflake UI
 
--- Ensure database and schema context
+-- ========================================
+-- STEP-BY-STEP UI GRANT INSTRUCTIONS
+-- ========================================
+
+SELECT 
+'=== SNOWMAIL PERMISSION SETUP ===' AS title,
+'' AS blank1,
+'Step 1: Navigate to Snowflake UI' AS step_1,
+'  Go to: Apps → Installed Apps (or Native Apps)' AS step_1_detail,
+'' AS blank2,
+'Step 2: Open SnowMail App' AS step_2,
+'  Click on: SNOWMAIL application' AS step_2_detail,
+'' AS blank3,
+'Step 3: Access Security/Privileges' AS step_3,
+'  Click: Security tab or Manage Privileges button' AS step_3_detail,
+'' AS blank4,
+'Step 4: Grant Database Access' AS step_4,
+'  Object Type: Database' AS step_4_a,
+'  Object: ACCELERATE_AI_IN_FSI' AS step_4_b,
+'  Privilege: USAGE' AS step_4_c,
+'  Click: Grant' AS step_4_d,
+'' AS blank5,
+'Step 5: Grant Schema Access' AS step_5,
+'  Object Type: Schema' AS step_5_a,
+'  Object: ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA' AS step_5_b,
+'  Privilege: USAGE' AS step_5_c,
+'  Click: Grant' AS step_5_d,
+'' AS blank6,
+'Step 6: Grant Table Access' AS step_6,
+'  Object Type: Table' AS step_6_a,
+'  Object: ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS' AS step_6_b,
+'  Privileges: SELECT and DELETE' AS step_6_c,
+'  Click: Grant' AS step_6_d,
+'' AS blank7,
+'Step 7: Grant Warehouse Access' AS step_7,
+'  Object Type: Warehouse' AS step_7_a,
+'  Object: DEFAULT_WH' AS step_7_b,
+'  Privilege: USAGE' AS step_7_c,
+'  Click: Grant' AS step_7_d,
+'' AS blank8,
+'Step 8: Refresh SnowMail' AS step_8,
+'  Refresh your browser or reopen the app' AS step_8_detail,
+'' AS blank9,
+'✅ SnowMail should now work!' AS success;
+
+-- ========================================
+-- VERIFY EMAIL_PREVIEWS TABLE EXISTS
+-- ========================================
+
 USE DATABASE ACCELERATE_AI_IN_FSI;
 USE SCHEMA DEFAULT_SCHEMA;
 
--- Verify EMAIL_PREVIEWS table exists
-CREATE TABLE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS (
-    EMAIL_ID VARCHAR(100) PRIMARY KEY,
-    RECIPIENT_EMAIL VARCHAR(500),
-    SUBJECT VARCHAR(1000),
-    HTML_CONTENT VARCHAR,
-    CREATED_AT TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    TICKER VARCHAR(50),
-    RATING VARCHAR(50),
-    SENTIMENT VARCHAR(50)
-)
-COMMENT = 'Email previews for SnowMail Native App';
-
--- Re-grant all necessary permissions to SnowMail application role
--- Native Apps access consumer data through APPLICATION ROLE grants
-
-USE ROLE ACCOUNTADMIN;
-
--- Set context
-USE DATABASE ACCELERATE_AI_IN_FSI;
-USE SCHEMA DEFAULT_SCHEMA;
-
--- Grant ATTENDEE_ROLE the ability to grant to application roles
-GRANT MANAGE GRANTS ON ACCOUNT TO ROLE ATTENDEE_ROLE;
-
--- Switch to ATTENDEE_ROLE (the owner of the database)
-USE ROLE ATTENDEE_ROLE;
-
--- Grant to the application role (app_public) defined in setup.sql
-GRANT USAGE ON DATABASE ACCELERATE_AI_IN_FSI TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT USAGE ON SCHEMA ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA TO APPLICATION ROLE SNOWMAIL.app_public;
-GRANT SELECT, DELETE ON TABLE ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS TO APPLICATION ROLE SNOWMAIL.app_public;
-
--- Switch back to ACCOUNTADMIN for warehouse grant
-USE ROLE ACCOUNTADMIN;
-GRANT USAGE ON WAREHOUSE DEFAULT_WH TO APPLICATION ROLE SNOWMAIL.app_public;
-
--- Verify grants
-SHOW GRANTS TO APPLICATION SNOWMAIL;
-
-SELECT '✅ SnowMail permissions restored!' AS status,
-       'Try refreshing the SnowMail app' AS next_step;
+SELECT 'Email table status:' AS info, 
+       COUNT(*) AS row_count,
+       'emails available' AS status
+FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
 
 -- ========================================
--- Additional Troubleshooting
--- ========================================
--- If the issue persists:
--- 1. Verify EMAIL_PREVIEWS has data:
---    SELECT COUNT(*) FROM ACCELERATE_AI_IN_FSI.DEFAULT_SCHEMA.EMAIL_PREVIEWS;
---
--- 2. Re-run script 07_deploy_snowmail.sql to redeploy the app
---
--- 3. Check application status:
---    SHOW APPLICATIONS LIKE 'SNOWMAIL';
+-- WHY UI GRANTS ARE REQUIRED
 -- ========================================
 
+SELECT 
+'Native Apps in this Snowflake version require UI-based grants.' AS explanation,
+'SQL GRANT commands to APPLICATION or APPLICATION ROLE are not supported.' AS reason,
+'The UI provides the proper grant mechanism for Native Apps.' AS solution;
