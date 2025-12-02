@@ -224,30 +224,36 @@ SELECT 'Git integration ready!' AS status,
 
 #### Step 2b: Access Git Repository in Snowflake UI
 
-Now navigate to the Git repository you just created:
+Now will create a workspace from the github repository
 
-1. Click **Projects** in the left sidebar
-2. Click **Git Repositories**
-3. You'll see: **SNOWFLAKE_QUICKSTART_REPOS.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO**
-4. Click on the repository name
+1. Create a Workspace from Github repository
+   ![1764683735634](image/quickstart/1764683735634.png)
+2. When Prompted, populate the following screen
+![1764683845282](image/quickstart/1764683845282.png)
+Use the following URL in the Repository URL field:
+
+https://github.com/sfc-gh-boconnor/Build-an-AI-Assistant-for-FSI-with-AISQL-and-Snowflake-Intelligence.git
+
+3. Press **Create**
 
 **You should see the repository file structure:**
 ```
 ├── README.md
 ├── quickstart.md
-├── DEPLOYMENT_ORDER.md
 ├── LICENSE
 └── assets/
-    ├── sql/           ← Deployment scripts (START HERE)
-    ├── data/          ← CSV/Parquet files
-    ├── documents/     ← PDFs, images, audio
-    ├── Notebooks/     ← Jupyter notebooks
-    ├── Streamlit/     ← Streamlit app
-    └── ...
+    ├── sql/                  ← Deployment scripts (START HERE)
+    ├── data/                 ← CSV/Parquet files
+    ├── documents/            ← PDFs, images, audio
+    ├── Notebooks/            ← Jupyter notebooks
+    ├── Streamlit/            ← Streamlit app
+    ├── native_app_snowmail/  ← SnowMail native app
+    ├── semantic_models/      ← Cortex Analyst YAML files
+    └── images/               ← Screenshots for quickstart
 ```
 
-5. **Navigate to `assets/sql/`** - This is where the deployment scripts are
-6. You'll see 10 SQL files (00-08 + 05b)
+1. **Navigate to `assets/sql/`** - This is where the deployment scripts are
+2. You'll see 10 SQL files (00-08 + 05b)
 
 ✅ **You're now ready to deploy!**
 
