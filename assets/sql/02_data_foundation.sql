@@ -1240,7 +1240,11 @@ CREATE TEMPORARY STAGE IF NOT EXISTS ACCELERATE_AI_IN_FSI.DOCUMENT_AI.parsed_ana
     TRIM_SPACE = FALSE
   );
 
--- PUT command removed (not needed for Git integration)
+-- Copy file from Git repository to stage first
+COPY FILES
+INTO @ACCELERATE_AI_IN_FSI.DOCUMENT_AI.parsed_analyst_stage
+FROM @ACCELERATE_AI_IN_FSI.GIT_REPOS.ACCELERATE_AI_IN_FSI_REPO/branches/main/assets/data/
+FILES = ('parsed_analyst_reports.csv');
 
 TRUNCATE TABLE ACCELERATE_AI_IN_FSI.DOCUMENT_AI.PARSED_ANALYST_REPORTS;
 
