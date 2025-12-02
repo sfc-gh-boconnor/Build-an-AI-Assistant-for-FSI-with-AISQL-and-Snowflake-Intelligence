@@ -89,48 +89,7 @@ This quickstart deploys a **complete multi-modal AI platform** combining:
 
 ### System Architecture
 
-```mermaid
-graph TB
-    subgraph Platform["SNOWFLAKE CORTEX AI PLATFORM"]
-        subgraph DataSources["Data Sources"]
-            DocAI["Document AI<br/>• PDF Parsing<br/>• HTML Extract<br/>• 850 Reports<br/>• AI_EXTRACT"]
-            Audio["Audio Analysis<br/>• AI Transcribe<br/>• AI Sentiment<br/>• 3 Calls<br/>• Speaker ID"]
-            Market["Market Data<br/>• Stock Prices<br/>• Parquet Load<br/>• 6,420 rows<br/>• Pivot Table"]
-        end
-        
-        DataFoundation["DATA FOUNDATION<br/>20+ Tables<br/>• Transcripts • Reports • Emails<br/>• Sentiment • Metrics • Embeddings"]
-        
-        subgraph AIServices["AI Services Layer"]
-            Search["Cortex Search<br/>5 Services:<br/>• Sentiment<br/>• Reports<br/>• Emails<br/>• Calls<br/>• Graphics"]
-            Analyst["Cortex Analyst<br/>2 Semantic Views:<br/>• 11 Companies<br/>• Snowflake Data<br/>• TICKER_SNOW Filter"]
-            ML["ML Models<br/>• Training<br/>• GPU Accel<br/>• Prediction<br/>• Registry"]
-        end
-        
-        Agent["SNOWFLAKE INTELLIGENCE<br/>One Ticker Agent<br/>• 5 Search Tools<br/>• 2 Analyst Tools<br/>• WEB_SEARCH Tool<br/>• REST API"]
-        
-        App["STOCKONE STREAMLIT<br/>APPLICATION<br/>• Chat Interface<br/>• Tool Toggles<br/>• Visualizations<br/>• Feedback API"]
-        
-        DocAI --> DataFoundation
-        Audio --> DataFoundation
-        Market --> DataFoundation
-        
-        DataFoundation --> Search
-        DataFoundation --> Analyst
-        DataFoundation --> ML
-        
-        Search --> Agent
-        Analyst --> Agent
-        ML --> Agent
-        
-        Agent --> App
-    end
-    
-    style Platform fill:#e3f2fd
-    style DataSources fill:#fff3e0
-    style AIServices fill:#f3e5f5
-    style Agent fill:#e8f5e9
-    style App fill:#fce4ec
-```
+![System Architecture](assets/images/general/architecture.png)
 
 ### Key Technologies
 
